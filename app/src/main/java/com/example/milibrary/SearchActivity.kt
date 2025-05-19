@@ -1,16 +1,13 @@
 package com.example.milibrary
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.example.milibrary.ui.theme.MiLibraryTheme
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Callback
 import retrofit2.Call
 import retrofit2.Response
@@ -20,6 +17,9 @@ class SearchActivity : ComponentActivity() {
     private lateinit var editTextBookTitle: EditText
     private lateinit var buttonSearchByTitle: Button
     private lateinit var buttonScanISBN: Button
+    private lateinit var bookAdapter: BookAdapter
+    private val booksList = mutableListOf<Book>()
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,8 +42,13 @@ class SearchActivity : ComponentActivity() {
             searchBooksByISBN(isbn)
         }
 
+        // Setup RecyclerView
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        setupRecyclerView()
 
     }
+
 
     // Function to search for books by ISBN
     private fun searchBooksByISBN(isbn: String) {
@@ -74,10 +79,13 @@ class SearchActivity : ComponentActivity() {
                 if (response.isSuccessful) {
                     val bookList = response.body()?.items
                     if (bookList != null && bookList.isNotEmpty()) {
-
+                        booksList.clear()
+                        booksList.addAll(bookList)
+                        bookAdapter.notifyDataSetChanged()
                     } else {
                         Toast.makeText(this@SearchActivity, "No books found", Toast.LENGTH_SHORT).show()
                     }
+
                 } else {
                     Toast.makeText(this@SearchActivity, "Error: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
@@ -88,4 +96,14 @@ class SearchActivity : ComponentActivity() {
             }
         })
     }
+
+    private fun setupRecyclerView() {
+        bookAdapter = BookAdapter(booksList) { selectedBook ->
+            val intent = Intent(this, DetailActivity::class.java)
+            intent.putExtra("book", selectedBook)
+            startActivity(intent)
+        }
+        recyclerView.adapter = bookAdapter
+    }
+
 }

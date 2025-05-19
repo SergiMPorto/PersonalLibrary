@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 android {
@@ -64,6 +66,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.generativeai)
     implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.cardview)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
