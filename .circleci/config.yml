@@ -70,38 +70,23 @@ jobs:
           root: .
           paths:
             - build/reports/kover/xml/report.xml
-      - save-gradle-cache
-      - store_test_results: 
-          path: build/test-results
-      - store_artifacts: 
-          path: build/reports/tests
-          destination: test-reports
-      - store_artifacts: 
-          path: build/reports/jacoco
-          destination: coverage-reports
-      - persist_to_workspace:
-          root: .
-          paths:
-            - build/reports/kover/xml/report.xml
 
   sonarcloud-analysis:
     executor: kotlin-executor
     steps:
-      - setup-workspace
+      - checkout
+      - attach_workspace:
+          at: .
       - sonarcloud/scan:
           sonar_token_variable_name: SONAR_TOKEN
 
   snyk-analysis:
     executor: kotlin-executor
     steps:
-      - setup-workspace
-      - snyk/scan:
-          fail-on-issues: false
-          monitor-on-build: false
-          token-variable: SNYK_TOKEN
-      - store_artifacts:
-          path: build/reports/snyk
-          destination: security-reports
+      - checkout
+      - attach_workspace:
+          at: .
+      - snyk/scan
 
 workflows:
   library-ci:
