@@ -6,8 +6,7 @@ plugins {
     id("kotlin-kapt")
     jacoco
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
-    id("io.gitlab.arturbosch.detekt") version "1.23.1"
-
+    id("io.gitlab.arturbosch.detekt") version "1.23.6"
 }
 
 android {
@@ -37,13 +36,16 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
+
     buildFeatures {
         compose = true
         buildConfig = true
@@ -57,6 +59,20 @@ android {
         }
     }
 }
+
+// ✅ Configuración correcta de Detekt
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom("$projectDir/config/detekt/detekt.yml")
+    baseline = file("$projectDir/config/detekt/baseline.xml")
+}
+
+// ✅ Configuración específica para tasks de Detekt
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "17"
+}
+
 
 dependencies {
 
