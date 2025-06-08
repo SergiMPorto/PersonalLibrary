@@ -1,11 +1,11 @@
 version: 2.1
 
 orbs: 
-  android: circleci/android@3.1.0
+  android: circleci/android@2.3.0
   gradle: circleci/gradle@3.0.0
-  docker: circleci/docker@2.8.2
-  sonarcloud: sonarsource/sonarcloud@3.0.0
-  snyk: snyk/snyk@2.3.0
+  docker: circleci/docker@2.2.0
+  sonarcloud: sonarsource/sonarcloud@2.0.0
+  snyk: snyk/snyk@1.5.0
 
 executors:
   kotlin-executor:
@@ -45,6 +45,9 @@ jobs:
     executor: kotlin-executor
     steps:
       - checkout
+      - run:
+          name: Dar permisos de ejecución a gradlew
+          command: chmod +x gradlew
       - restore-gradle-cache
       - run: 
           name: Ejecutar Detekt
@@ -70,6 +73,9 @@ jobs:
     executor: kotlin-executor
     steps:
       - checkout
+      - run:
+          name: Dar permisos de ejecución a gradlew
+          command: chmod +x gradlew
       - restore-gradle-cache
       - run: 
           name: Compilar proyecto
@@ -98,6 +104,9 @@ jobs:
     executor: kotlin-executor
     steps:
       - checkout
+      - run:
+          name: Dar permisos de ejecución a gradlew
+          command: chmod +x gradlew
       - restore-gradle-cache
       - attach_workspace:
           at: .
@@ -108,6 +117,9 @@ jobs:
     executor: kotlin-executor
     steps:
       - checkout
+      - run:
+          name: Dar permisos de ejecución a gradlew
+          command: chmod +x gradlew
       - restore-gradle-cache
       - attach_workspace:
           at: .
