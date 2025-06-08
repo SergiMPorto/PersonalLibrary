@@ -1,0 +1,42 @@
+build:
+  maxIssues: 0
+  weights:
+    complexity: 2
+    LongParameterList: 1
+    style: 1
+  exclusions: '.*test.*,.*/resources/.*,.*/tmp/.*'
+
+processors:
+  active: true
+  exclude:
+    - 'FunctionCountProcessor'
+    - 'PropertyCountProcessor'
+
+console-reports:
+  active: true
+
+output-reports:
+  active: true
+  xml:
+    enabled: true
+    destination: build/reports/detekt/detekt-report.xml
+  html:
+    enabled: true
+    destination: build/reports/detekt/detekt-report.html
+  txt:
+    enabled: false
+  sarif:
+    enabled: false
+
+style:
+  MagicNumber:
+    active: false
+  WildcardImport:
+    active: true
+  MaxLineLength:
+    active: true
+    maxLineLength: 120
+
+naming:
+  FunctionNaming:
+    functionPattern: '^([a-z][a-zA-Z0-9]*)|(`.*`)$'
