@@ -50,11 +50,10 @@ jobs:
           destination: detekt-reports
       - store_artifacts: 
           path: build/reports/dependency-check-report.html
-          destination: security-reports
 
   build-and-test:
-    executor: android-executor
-    steps:
+      executor: android-executor
+      steps:
       - checkout
       - run:
           name: Crear local.properties
@@ -62,21 +61,23 @@ jobs:
       - fix-gradlew
       - restore-gradle-cache
       - run: ./gradlew testDebugUnitTest koverXmlReport
-
-
+      - run:
+          name: Comprobar reportes
+          command: ls -R build/reports || echo "No se encontraron reportes"
       - save-gradle-cache
-      - store_test_results: 
+      - store_test_results:
           path: build/test-results
-      - store_artifacts: 
+      - store_artifacts:
           path: build/reports/tests
           destination: test-reports
-      - store_artifacts: 
+      - store_artifacts:
           path: build/reports/kover
           destination: coverage-reports
       - persist_to_workspace:
           root: .
           paths:
             - build/reports/kover/xml/report.xml
+
 
   sonarcloud-analysis:
     executor: android-executor
