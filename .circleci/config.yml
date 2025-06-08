@@ -1,9 +1,7 @@
 version: 2.1
 
 orbs: 
-  android: circleci/android@2.3.0
   gradle: circleci/gradle@3.0.0
-  docker: circleci/docker@2.2.0
   sonarcloud: sonarsource/sonarcloud@2.0.0
   snyk: snyk/snyk@1.5.0
 
@@ -16,52 +14,29 @@ executors:
       GRADLE_OPTS: -Xmx3200m -Dorg.gradle.daemon=false
       JVM_OPTS: -Xmx3200m
 
-  android-executor:
-    docker:
-      - image: cimg/android:2024.01.1
-    working_directory: ~/library-app
-    environment:
-      GRADLE_OPTS: -Xmx3200m -Dorg.gradle.daemon=false
-
 commands:
-  restore-gradle-cache:
+  # Los comandos de caché ya no son necesarios con el orb de Gradle
+  setup-workspace:
     steps:
-      - restore_cache:
-          keys:
-            - v1-gradle-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-            - v1-gradle-
-
-  save-gradle-cache:
-    description: "Guardar caché de Gradle"
-    steps:
-      - save_cache:
-          paths:
-            - ~/.gradle/caches
-            - ~/.gradle/wrapper
-          key: v1-gradle-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+      - checkout
+      - attach_workspace:
+          at: .
 
 jobs:
   build:
     executor: kotlin-executor
     steps:
       - checkout
-      - run:
-          name: Dar permisos de ejecución a gradlew
-          command: chmod +x gradlew
-      - restore-gradle-cache
-      - run: 
-          name: Ejecutar Detekt
-          command: ./gradlew detekt
-      - run: 
-          name: Ejecutar ktlint
-          command: ./gradlew ktlintCheck
-      - run: 
-          name: Verificar formato con Spotless
-          command: ./gradlew spotlessCheck
-      - run: 
-          name: Análisis de dependencias
-          command: ./gradlew dependencyCheckAnalyze
-      - save-gradle-cache
+      - gradle/with_cache:
+          steps:
+            - gradle/run:
+                command: detekt
+            - gradle/run:
+                command: ktlintCheck  
+            - gradle/run:
+                command: spotlessCheck
+            - gradle/run:
+                command: dependencyCheckAnalyze
       - store_artifacts: 
           path: build/reports/detekt
           destination: detekt-reports
@@ -73,19 +48,27 @@ jobs:
     executor: kotlin-executor
     steps:
       - checkout
-      - run:
-          name: Dar permisos de ejecución a gradlew
-          command: chmod +x gradlew
-      - restore-gradle-cache
-      - run: 
-          name: Compilar proyecto
-          command: ./gradlew build -x test
-      - run: 
-          name: Ejecutar tests unitarios
-          command: ./gradlew test jacocoTestReport
-      - run: 
-          name: Generar reporte de cobertura
-          command: ./gradlew koverXmlReport
+      - gradle/with_cache:
+          steps:
+            - gradle/run:
+                command: build -x test
+            - gradle/test
+            - gradle/run:
+                command: jacocoTestReport
+            - gradle/run:
+                command: koverXmlReport
+      - store_test_results: 
+          path: build/test-results
+      - store_artifacts: 
+          path: build/reports/tests
+          destination: test-reports
+      - store_artifacts: 
+          path: build/reports/jacoco
+          destination: coverage-reports
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build/reports/kover/xml/report.xml
       - save-gradle-cache
       - store_test_results: 
           path: build/test-results
@@ -103,26 +86,14 @@ jobs:
   sonarcloud-analysis:
     executor: kotlin-executor
     steps:
-      - checkout
-      - run:
-          name: Dar permisos de ejecución a gradlew
-          command: chmod +x gradlew
-      - restore-gradle-cache
-      - attach_workspace:
-          at: .
+      - setup-workspace
       - sonarcloud/scan:
           sonar_token_variable_name: SONAR_TOKEN
 
   snyk-analysis:
     executor: kotlin-executor
     steps:
-      - checkout
-      - run:
-          name: Dar permisos de ejecución a gradlew
-          command: chmod +x gradlew
-      - restore-gradle-cache
-      - attach_workspace:
-          at: .
+      - setup-workspace
       - snyk/scan:
           fail-on-issues: false
           monitor-on-build: false
