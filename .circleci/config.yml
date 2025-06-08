@@ -61,8 +61,9 @@ jobs:
           command: echo "sdk.dir=/opt/android/sdk" > local.properties
       - fix-gradlew
       - restore-gradle-cache
-      - run: ./gradlew build -x test
-      - run: ./gradlew test jacocoTestReport koverXmlReport
+      - run: ./gradlew testDebugUnitTest koverXmlReport
+
+
       - save-gradle-cache
       - store_test_results: 
           path: build/test-results
@@ -70,7 +71,7 @@ jobs:
           path: build/reports/tests
           destination: test-reports
       - store_artifacts: 
-          path: build/reports/jacoco
+          path: build/reports/kover
           destination: coverage-reports
       - persist_to_workspace:
           root: .

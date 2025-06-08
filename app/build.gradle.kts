@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     id("kotlin-parcelize")
     id("kotlin-kapt")
+    jacoco
+    id("org.jetbrains.kotlinx.kover") version "0.7.6"
 }
 
 android {
