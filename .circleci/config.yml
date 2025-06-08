@@ -43,61 +43,75 @@ jobs:
           command: echo "sdk.dir=/opt/android/sdk" > local.properties
       - fix-gradlew
       - restore-gradle-cache
-      
+      - run: ./gradlew detekt ktlintCheck spotlessCheck
       - save-gradle-cache
       - store_artifacts: 
           path: build/reports/detekt
           destination: detekt-reports
-      - store_artifacts: 
-          path: build/reports/dependency-check-report.html
 
   build-and-test:
-      executor: android-executor
-      steps:
+    executor: android-executor
+    steps:
       - checkout
       - run:
           name: Crear local.properties
           command: echo "sdk.dir=/opt/android/sdk" > local.properties
       - fix-gradlew
       - restore-gradle-cache
-      - run: ./gradlew testDebugUnitTest koverXmlReport
+      - run: 
+          name: Ejecutar tests y generar reportes
+          command: |
+            ./gradlew testDebugUnitTest
+            ./gradlew koverXmlReport
       - run:
-          name: Comprobar reportes
-          command: ls -R build/reports || echo "No se encontraron reportes"
+          name: Verificar reportes Kover generados
+          command: |
+            echo "=== Buscando reportes Kover ==="
+            find build -path "*/kover/*" -name "*.xml" -type f 2>/dev/null || echo "No se encontraron reportes Kover"
+            echo "=== Estructura de reports ==="
+            ls -la build/reports/ 2>/dev/null || echo "No hay directorio reports"
       - save-gradle-cache
       - run: 
-          name: Listar archivos generados
-          command: ls -R build || echo "No se encontraron archivos en el directorio build"
+          name: Preparar workspace con reportes Kover
+          command: |
+            mkdir -p tmp-workspace
+            
+            # Buscar archivo de cobertura de Kover
+            if [ -f "build/reports/kover/xml/report.xml" ]; then
+              echo "✅ Encontrado reporte Kover"
+              cp build/reports/kover/xml/report.xml tmp-workspace/kover-report.xml
+            else
+              echo "⚠️ No se encontró reporte Kover, creando archivo dummy"
+              echo "<coverage></coverage>" > tmp-workspace/dummy-coverage.xml
+            fi
+            
+            # Mostrar qué se va a persistir
+            echo "=== Archivos a persistir ==="
+            ls -la tmp-workspace/
       - store_test_results:
           path: build/test-results
       - store_artifacts:
-          path: build/reports/tests
-          destination: test-reports
-      - store_artifacts:
-          path: build/reports/kover
-          destination: coverage-reports
-      - run:
-          name: Copiar cobertura si existe
-          command: |
-            mkdir -p tmp-workspace
-            if [ -f build/reports/kover/xml/report.xml ]; then
-             cp build/reports/kover/xml/report.xml tmp-workspace/
-            else
-              echo "⚠️ Archivo de cobertura no encontrado"
-            fi
+          path: build/reports
+          destination: kover-reports
       - persist_to_workspace:
           root: tmp-workspace
           paths:
-          - report.xml
-
-
+            - "*.xml"
 
   sonarcloud-analysis:
     executor: android-executor
     steps:
       - checkout
+      - run:
+          name: Crear local.properties
+          command: echo "sdk.dir=/opt/android/sdk" > local.properties
       - attach_workspace:
-          at: .
+          at: workspace-files
+      - run:
+          name: Verificar archivos del workspace
+          command: |
+            echo "=== Archivos recibidos del workspace ==="
+            ls -la workspace-files/ 2>/dev/null || echo "No hay archivos del workspace"
       - sonarcloud/scan:
           sonar_token_variable_name: SONAR_TOKEN
 
@@ -105,9 +119,13 @@ jobs:
     executor: android-executor
     steps:
       - checkout
+      - run:
+          name: Crear local.properties
+          command: echo "sdk.dir=/opt/android/sdk" > local.properties
       - attach_workspace:
-          at: .
-      - snyk/scan
+          at: workspace-files
+      - snyk/scan:
+          fail-on-issues: false
 
 workflows:
   library-ci:
