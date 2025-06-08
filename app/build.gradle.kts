@@ -7,6 +7,8 @@ plugins {
     jacoco
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+    id("com.diffplug.spotless") version "6.25.0"
 }
 
 android {
@@ -60,7 +62,7 @@ android {
     }
 }
 
-// ✅ Configuración correcta de Detekt
+
 detekt {
     buildUponDefaultConfig = true
     allRules = false
@@ -68,11 +70,25 @@ detekt {
     baseline = file("$projectDir/config/detekt/baseline.xml")
 }
 
-// ✅ Configuración específica para tasks de Detekt
+
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     jvmTarget = "17"
 }
+ktlint {
+    version.set("1.0.1")
+    debug.set(false)
+    verbose.set(true)
+    android.set(true)
+    outputToConsole.set(true)
+    ignoreFailures.set(false)
+}
 
+spotless {
+    kotlin {
+        target("**/*.kt")
+        ktlint()
+    }
+}
 
 dependencies {
 
