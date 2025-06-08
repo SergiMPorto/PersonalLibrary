@@ -1,0 +1,134 @@
+version: 2.1
+
+orbs: 
+  android: circleci/android@3.1.0
+  gradle: circleci/gradle@3.0.0
+  docker: circleci/docker@2.8.2
+  sonarcloud: sonarsource/sonarcloud@3.0.0
+  snyk: snyk/snyk@2.3.0
+
+executors:
+  kotlin-executor:
+    docker:
+      - image: cimg/openjdk:17.0
+    working_directory: ~/library-app
+    environment:
+      GRADLE_OPTS: -Xmx3200m -Dorg.gradle.daemon=false
+      JVM_OPTS: -Xmx3200m
+
+  android-executor:
+    docker:
+      - image: cimg/android:2024.01.1
+    working_directory: ~/library-app
+    environment:
+      GRADLE_OPTS: -Xmx3200m -Dorg.gradle.daemon=false
+
+commands:
+  restore-gradle-cache:
+    steps:
+      - restore_cache:
+          keys:
+            - v1-gradle-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+            - v1-gradle-
+
+  save-gradle-cache:
+    description: "Guardar caché de Gradle"
+    steps:
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+          key: v1-gradle-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+
+jobs:
+  build:
+    executor: kotlin-executor
+    steps:
+      - checkout
+      - restore-gradle-cache
+      - run: 
+          name: Ejecutar Detekt
+          command: ./gradlew detekt
+      - run: 
+          name: Ejecutar ktlint
+          command: ./gradlew ktlintCheck
+      - run: 
+          name: Verificar formato con Spotless
+          command: ./gradlew spotlessCheck
+      - run: 
+          name: Análisis de dependencias
+          command: ./gradlew dependencyCheckAnalyze
+      - save-gradle-cache
+      - store_artifacts: 
+          path: build/reports/detekt
+          destination: detekt-reports
+      - store_artifacts: 
+          path: build/reports/dependency-check-report.html
+          destination: security-reports
+
+  build-and-test:
+    executor: kotlin-executor
+    steps:
+      - checkout
+      - restore-gradle-cache
+      - run: 
+          name: Compilar proyecto
+          command: ./gradlew build -x test
+      - run: 
+          name: Ejecutar tests unitarios
+          command: ./gradlew test jacocoTestReport
+      - run: 
+          name: Generar reporte de cobertura
+          command: ./gradlew koverXmlReport
+      - save-gradle-cache
+      - store_test_results: 
+          path: build/test-results
+      - store_artifacts: 
+          path: build/reports/tests
+          destination: test-reports
+      - store_artifacts: 
+          path: build/reports/jacoco
+          destination: coverage-reports
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build/reports/kover/xml/report.xml
+
+  sonarcloud-analysis:
+    executor: kotlin-executor
+    steps:
+      - checkout
+      - restore-gradle-cache
+      - attach_workspace:
+          at: .
+      - sonarcloud/scan:
+          sonar_token_variable_name: SONAR_TOKEN
+
+  snyk-analysis:
+    executor: kotlin-executor
+    steps:
+      - checkout
+      - restore-gradle-cache
+      - attach_workspace:
+          at: .
+      - snyk/scan:
+          fail-on-issues: false
+          monitor-on-build: false
+          token-variable: SNYK_TOKEN
+      - store_artifacts:
+          path: build/reports/snyk
+          destination: security-reports
+
+workflows:
+  library-ci:
+    jobs:
+      - build
+      - build-and-test:
+          requires:
+            - build
+      - sonarcloud-analysis:
+          requires:
+            - build-and-test
+      - snyk-analysis:
+          requires:
+            - build-and-test
