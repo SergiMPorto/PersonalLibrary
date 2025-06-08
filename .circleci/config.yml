@@ -1,7 +1,6 @@
 version: 2.1
 
 orbs: 
-  gradle: circleci/gradle@3.0.0
   sonarcloud: sonarsource/sonarcloud@2.0.0
   snyk: snyk/snyk@1.5.0
 
@@ -15,28 +14,34 @@ executors:
       JVM_OPTS: -Xmx3200m
 
 commands:
-  # Los comandos de caché ya no son necesarios con el orb de Gradle
-  setup-workspace:
+  fix-gradlew:
     steps:
-      - checkout
-      - attach_workspace:
-          at: .
+      - run: sed -i 's/\r$//' gradlew && chmod +x gradlew
+
+  restore-gradle-cache:
+    steps:
+      - restore_cache:
+          keys:
+            - v1-gradle-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+            - v1-gradle-
+
+  save-gradle-cache:
+    steps:
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+          key: v1-gradle-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
 
 jobs:
   build:
     executor: kotlin-executor
     steps:
       - checkout
-      - gradle/with_cache:
-          steps:
-            - gradle/run:
-                command: detekt
-            - gradle/run:
-                command: ktlintCheck  
-            - gradle/run:
-                command: spotlessCheck
-            - gradle/run:
-                command: dependencyCheckAnalyze
+      - fix-gradlew
+      - restore-gradle-cache
+      - run: ./gradlew detekt ktlintCheck spotlessCheck dependencyCheckAnalyze
+      - save-gradle-cache
       - store_artifacts: 
           path: build/reports/detekt
           destination: detekt-reports
@@ -48,15 +53,11 @@ jobs:
     executor: kotlin-executor
     steps:
       - checkout
-      - gradle/with_cache:
-          steps:
-            - gradle/run:
-                command: build -x test
-            - gradle/test
-            - gradle/run:
-                command: jacocoTestReport
-            - gradle/run:
-                command: koverXmlReport
+      - fix-gradlew
+      - restore-gradle-cache
+      - run: ./gradlew build -x test
+      - run: ./gradlew test jacocoTestReport koverXmlReport
+      - save-gradle-cache
       - store_test_results: 
           path: build/test-results
       - store_artifacts: 
