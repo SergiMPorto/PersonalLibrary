@@ -5,9 +5,9 @@ orbs:
   snyk: snyk/snyk@1.5.0
 
 executors:
-  kotlin-executor:
+  android-executor:
     docker:
-      - image: cimg/openjdk:17.0
+      - image: circleci/android:api-30
     working_directory: ~/library-app
     environment:
       GRADLE_OPTS: -Xmx3200m -Dorg.gradle.daemon=false
@@ -35,7 +35,7 @@ commands:
 
 jobs:
   build:
-    executor: kotlin-executor
+    executor: android-executor
     steps:
       - checkout
       - run:
@@ -53,7 +53,7 @@ jobs:
           destination: security-reports
 
   build-and-test:
-    executor: kotlin-executor
+    executor: android-executor
     steps:
       - checkout
       - run:
@@ -78,7 +78,7 @@ jobs:
             - build/reports/kover/xml/report.xml
 
   sonarcloud-analysis:
-    executor: kotlin-executor
+    executor: android-executor
     steps:
       - checkout
       - attach_workspace:
@@ -87,7 +87,7 @@ jobs:
           sonar_token_variable_name: SONAR_TOKEN
 
   snyk-analysis:
-    executor: kotlin-executor
+    executor: android-executor
     steps:
       - checkout
       - attach_workspace:
