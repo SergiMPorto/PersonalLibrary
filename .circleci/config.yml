@@ -43,7 +43,9 @@ jobs:
           command: echo "sdk.dir=/opt/android/sdk" > local.properties
       - fix-gradlew
       - restore-gradle-cache
-      - run: ./gradlew detekt ktlintCheck spotlessCheck
+      - run: 
+          name: Análisis estático
+          command: ./gradlew detekt ktlintCheck spotlessCheck
       - save-gradle-cache
       - store_artifacts: 
           path: build/reports/detekt

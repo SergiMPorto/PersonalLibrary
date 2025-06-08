@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>FunctionNaming:Theme.kt$@Composable fun MiLibraryTheme( darkTheme: Boolean = isSystemInDarkTheme(), // Dynamic color is available on Android 12+ dynamicColor: Boolean = true, content: @Composable () -&gt; Unit )</ID>
+    <ID>NewLineAtEndOfFile:BakingViewModel.kt$com.example.milibrary.BakingViewModel.kt</ID>
+    <ID>NewLineAtEndOfFile:BookResponse.kt$com.example.milibrary.BookResponse.kt</ID>
+    <ID>NewLineAtEndOfFile:Color.kt$com.example.milibrary.ui.theme.Color.kt</ID>
+    <ID>NewLineAtEndOfFile:ExampleUnitTest.kt$com.example.milibrary.ExampleUnitTest.kt</ID>
+    <ID>NewLineAtEndOfFile:Theme.kt$com.example.milibrary.ui.theme.Theme.kt</ID>
+    <ID>NewLineAtEndOfFile:Type.kt$com.example.milibrary.ui.theme.Type.kt</ID>
+    <ID>NewLineAtEndOfFile:UiState.kt$com.example.milibrary.UiState.kt</ID>
+    <ID>TooGenericExceptionCaught:BakingViewModel.kt$BakingViewModel$e: Exception</ID>
+    <ID>WildcardImport:ExampleUnitTest.kt$import org.junit.Assert.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

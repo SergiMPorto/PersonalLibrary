@@ -65,9 +65,12 @@ android {
 
 detekt {
     buildUponDefaultConfig = true
-    allRules = false
-    config.setFrom("$projectDir/config/detekt/detekt.yml")
+    config.setFrom("$rootDir/detekt.yml")  // Usa tu configuración existente
     baseline = file("$projectDir/config/detekt/baseline.xml")
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "17"
 }
 
 
