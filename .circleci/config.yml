@@ -40,7 +40,7 @@ jobs:
       - checkout
       - run:
           name: Crear local.properties
-          command: echo "sdk.dir=$ANDROID_HOME" > local.properties
+          command: echo "sdk.dir=/opt/android/sdk" > local.properties
       - fix-gradlew
       - restore-gradle-cache
       
@@ -58,7 +58,7 @@ jobs:
       - checkout
       - run:
           name: Crear local.properties
-          command: echo "sdk.dir=$ANDROID_HOME" > local.properties
+          command: echo "sdk.dir=/opt/android/sdk" > local.properties
       - fix-gradlew
       - restore-gradle-cache
       - run: ./gradlew build -x test
