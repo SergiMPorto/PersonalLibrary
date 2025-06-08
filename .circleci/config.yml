@@ -38,6 +38,9 @@ jobs:
     executor: kotlin-executor
     steps:
       - checkout
+      - run:
+          name: Crear local.properties
+          command: echo "sdk.dir=$ANDROID_HOME" > local.properties
       - fix-gradlew
       - restore-gradle-cache
       - run: ./gradlew detekt ktlintCheck spotlessCheck dependencyCheckAnalyze
