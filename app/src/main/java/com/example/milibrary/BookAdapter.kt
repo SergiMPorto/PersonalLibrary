@@ -36,19 +36,17 @@ class BookAdapter(
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
         val book = bookList[position]
-        holder.title.text = book.volumeInfo.title ?: "Untitled"
-        holder.author.text = book.volumeInfo.authors?.joinToString(", ") ?: "Unknown Author"
+        holder.title.text = book.volumeInfo.title ?: "Título no disponible"
+        holder.author.text = book.volumeInfo.authors?.joinToString(", ") ?: "Autor desconocido"
 
         val rawThumbnailUrl = book.volumeInfo.imageLinks?.thumbnail
         val thumbnailUrl = rawThumbnailUrl?.replace("http://", "https://")
 
-        if (thumbnailUrl != null) {
-            Glide.with(holder.itemView.context)
-                .load(thumbnailUrl)
-                .into(holder.thumbnail)
-        } else {
-            holder.thumbnail.setImageResource(R.drawable.ic_book_cover_placeholder)
-        }
+       Glide.with(holder.itemView.context)
+            .load(thumbnailUrl)
+            .placeholder(R.drawable.placeholder_book)
+            .error(R.drawable.error_image)
+            .into(holder.thumbnail)
     }
 
 

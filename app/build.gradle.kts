@@ -16,6 +16,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "apiKey", "\"AIzaSyAGrTwLdoDbuuncHrHNQGRv61Q20KyhOaQ\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -88,4 +89,7 @@ dependencies {
     // Glide for update images from internet
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
 }

@@ -38,9 +38,11 @@ class BakingViewModel : ViewModel() {
                 )
                 response.text?.let { outputContent ->
                     _uiState.value = UiState.Success(outputContent)
+                } ?: run {
+                    _uiState.value = UiState.Error("No se recibio texto")
                 }
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.localizedMessage ?: "")
+                _uiState.value = UiState.Error(e.localizedMessage ?: "Error desconocido")
             }
         }
     }
