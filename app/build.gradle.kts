@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     id("kotlin-parcelize")
-    id("kotlin-kapt")
     jacoco
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
@@ -128,9 +127,10 @@ dependencies {
 
     // Glide for update images from internet
     implementation("com.github.bumptech.glide:glide:4.16.0")
-    kapt("com.github.bumptech.glide:compiler:4.16.0")
+
 
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
 }
+
