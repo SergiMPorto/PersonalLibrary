@@ -9,6 +9,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
     id("com.diffplug.spotless") version "6.25.0"
+    id ("com.google.devtools.ksp") version "1.9.10-1.0.13"
 }
 
 android {
