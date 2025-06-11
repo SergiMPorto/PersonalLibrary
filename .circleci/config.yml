@@ -127,20 +127,30 @@ jobs:
           command: |
             echo "=== Archivos recibidos del workspace ==="
             ls -la workspace-files/ 2>/dev/null || echo "No hay archivos del workspace"
-      - sonarcloud/scan:
-          sonar_token_variable_name: SONAR_TOKEN
-
-  snyk-analysis:
-    executor: android-executor
-    steps:
-      - checkout
       - run:
-          name: Crear local.properties
-          command: echo "sdk.dir=/opt/android/sdk" > local.properties
-      - attach_workspace:
-          at: workspace-files
-      - snyk/scan:
-          fail-on-issues: false
+          name: SonarCloud analysis
+          command: |
+            echo "Starting SonarCloud analysis"
+            sonar-scanner \
+              -Dsonar.projectKey=SergiMPorto_PersonalLibrary \
+              -Dsonar.organization=sergimporto \
+              -Dsonar.projectName="Personal Library" \
+              -Dsonar.projectVersion=1.0 \
+              -Dsonar.sources=app/src/main/java,app/src/main/kotlin \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.login=$SONAR_TOKEN
+         
+
+  snyk-security-scan:
+    docker:
+    - image: snyk/snyk:gradle
+    steps:
+    - checkout
+    - run:
+        name: Snyk security scan
+        command: |
+          snyk auth $SNYK_TOKEN
+          snyk test --all-projects
 
 workflows:
   library-ci:
@@ -152,6 +162,6 @@ workflows:
       - sonarcloud-analysis:
           requires:
             - build-and-test
-      - snyk-analysis:
+      - snyk-security-scan:
           requires:
             - build-and-test
