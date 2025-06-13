@@ -115,20 +115,12 @@ jobs:
 
   sonarcloud-analysis:
     docker:
-    - image: sonarsource/sonar-scanner-cli:latest
+      - image: sonarsource/sonar-scanner-cli:latest
     steps:
-    - checkout  
-    - run:
-        name: Configurar SonarCloud
-        command: |
-          sonar-scanner \
-            -Dsonar.projectKey=SergiMPorto_PersonalLibrary \
-            -Dsonar.organization=sergimporto \
-            -Dsonar.projectName="Personal Library" \
-            -Dsonar.projectVersion=1.0 \
-            -Dsonar.sources=app/src/main/java
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=$SONAR_TOKEN
+      - checkout  
+      - run:
+          name: SonarCloud analysis
+          command: sonar-scanner -Dsonar.projectKey=SergiMPorto_PersonalLibrary -Dsonar.organization=sergimporto -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=$SONAR_TOKEN
 
   snyk-security-scan:
     docker:
