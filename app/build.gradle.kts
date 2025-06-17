@@ -123,7 +123,9 @@ dependencies {
 
     //ZXing para escanear código de barras
 
-    implementation("com.journeyapps:zxing-android-embedded:4.1.0")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation ("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation("com.google.zxing:core:3.5.1")
 
     // Glide for update images from internet
     implementation("com.github.bumptech.glide:glide:4.16.0")
