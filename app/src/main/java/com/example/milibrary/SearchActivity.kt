@@ -28,6 +28,7 @@ class SearchActivity : ComponentActivity() {
     private val booksList = mutableListOf<Book>()
     private lateinit var recyclerView: RecyclerView
     private lateinit var scanButton: Button
+    private lateinit var buttonMyLibrary: Button
 
     // Scanner launcher
     private val scanLauncher: ActivityResultLauncher<ScanOptions> = registerForActivityResult(ScanContract()) { result ->
@@ -66,6 +67,7 @@ class SearchActivity : ComponentActivity() {
         buttonScanISBN = findViewById(R.id.buttonScanISBN)
         recyclerView = findViewById(R.id.recyclerView)
         scanButton = findViewById(R.id.scanButton)
+        buttonMyLibrary = findViewById(R.id.buttonMyLibrary)
         recyclerView.layoutManager = LinearLayoutManager(this)
     }
 
@@ -100,6 +102,46 @@ class SearchActivity : ComponentActivity() {
             startActivity(intent)
         }
         recyclerView.adapter = bookAdapter
+    }
+    private fun testApiConnection() {
+        showToast("🔄 Verificando conexión con tu biblioteca...")
+
+        RetrofitClient.myLibraryService.getHealth().enqueue(object : Callback<HealthResponse> {
+            override fun onResponse(call: Call<HealthResponse>, response: Response<HealthResponse>) {
+                runOnUiThread {
+                    if (response.isSuccessful) {
+                        val health = response.body()
+                        if (health?.status == "healthy") {
+                            showToast("✅ Conectado a tu biblioteca personal")
+                            buttonMyLibrary.setBackgroundColor(getColor(android.R.color.holo_green_dark))
+                        } else {
+                            showToast("⚠️ Biblioteca con problemas")
+                            buttonMyLibrary.setBackgroundColor(getColor(android.R.color.holo_orange_dark))
+                        }
+                    } else {
+                        handleConnectionError("Error del servidor: ${response.code()}")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<HealthResponse>, t: Throwable) {
+                runOnUiThread {
+                    val errorMessage = when {
+                        t.message?.contains("timeout") == true -> "Tiempo de espera agotado"
+                        t.message?.contains("Unable to resolve host") == true -> "Sin conexión a internet"
+                        t.message?.contains("Connection refused") == true -> "Servidor no disponible"
+                        else -> "Error de conexión"
+                    }
+                    handleConnectionError(errorMessage)
+                }
+            }
+        })
+    }
+
+    private fun handleConnectionError(message: String) {
+        showToast("❌ $message")
+        buttonMyLibrary.setBackgroundColor(getColor(android.R.color.holo_red_dark))
+        buttonMyLibrary.text = "❌ Mi Biblioteca (Sin conexión)"
     }
 
     private fun startScan() {
@@ -179,4 +221,10 @@ class SearchActivity : ComponentActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
+    override fun onResume() {
+        super.onResume()
+
+        testApiConnection()
+    }
+
 }

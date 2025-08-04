@@ -4,29 +4,86 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Título de la aplicación -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📚 Mi Biblioteca - Búsqueda"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/teal_700"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
     <EditText
         android:id="@+id/editTextBookTitle"
         android:hint="Enter title or ISBN"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/buttonSearchByTitle"
-        android:text="Search by Title"
+    <!-- Fila de botones principales -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
 
-    <Button
-        android:id="@+id/buttonScanISBN"
-        android:text="Search by ISBN"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/buttonSearchByTitle"
+            android:text="Search by Title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp" />
 
+        <Button
+            android:id="@+id/buttonScanISBN"
+            android:text="Search by ISBN"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp" />
+
+    </LinearLayout>
+
+    <!-- Botón de escanear -->
     <Button
         android:id="@+id/scanButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Scanning" />
+        android:text="📷 Escanear Código ISBN"
+        android:backgroundTint="@color/teal_700"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Botones de navegación -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/buttonMyLibrary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="📚 Mi Biblioteca"
+            android:backgroundTint="@color/teal_200"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/buttonTestConnection"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="🔧 Test API"
+            android:backgroundTint="@android:color/holo_blue_dark"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -35,4 +92,3 @@
         android:layout_weight="1" />
 
 </LinearLayout>
-

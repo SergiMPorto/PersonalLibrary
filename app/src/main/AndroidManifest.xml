@@ -8,8 +8,14 @@
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
 
 
 
@@ -22,19 +28,57 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MiLibrary"
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="31">
         <activity
             android:name=".SearchActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.MiLibrary">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DetailActivity" />
+
+        <!-- Actividad de detalles -->
+        <activity
+            android:name=".DetailActivity"
+            android:exported="false"
+            android:label="Detalles del Libro"
+            android:parentActivityName=".SearchActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SearchActivity" />
+        </activity>
+
+        <!-- Actividad de mi biblioteca -->
+        <activity
+            android:name=".MyLibraryActivity"
+            android:exported="false"
+            android:label="@string/my_library"
+            android:parentActivityName=".SearchActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SearchActivity" />
+        </activity>
+
+        <!-- Actividad de test de conexión -->
+        <activity
+            android:name=".ConnectionTestActivity"
+            android:exported="false"
+            android:label="Test de Conexión"
+            android:parentActivityName=".SearchActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SearchActivity" />
+        </activity>
+
+        <!-- Actividad del escáner de códigos de barras -->
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="screenOrientation" />
 
     </application>
 
