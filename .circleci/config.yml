@@ -156,7 +156,7 @@ jobs:
 
   semgrep-full-scan:
     docker:
-      - image: semgrep/semgrep:latest
+      - image: cimg/python:3.11
     steps:
       - checkout
       - run:
@@ -211,7 +211,7 @@ jobs:
 
   semgrep-diff-scan:
     docker:
-      - image: semgrep/semgrep:latest
+      - image: cimg/python:3.11
     steps:
       - checkout
       - run:
