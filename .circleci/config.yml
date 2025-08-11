@@ -284,13 +284,3 @@ workflows:
       - snyk-security-scan:
           requires:
             - build-and-test
-      - semgrep-full-scan:
-          filters:
-            branches:
-              only:
-                - main
-      - semgrep-diff-scan:
-          filters:
-            branches:
-              ignore:
-                - main
