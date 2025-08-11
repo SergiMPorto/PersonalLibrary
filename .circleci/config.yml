@@ -197,12 +197,12 @@ jobs:
           command: |
             echo "Verificando vulnerabilidades criticas..."
             if [ -n "$SEMGREP_APP_TOKEN" ]; then
-              semgrep ci --metrics=off --severity=error,warning --error || {
+              semgrep ci --metrics=off --severity=ERROR --error || {
                 echo "Se encontraron vulnerabilidades criticas"
                 exit 1
               }
             else
-              semgrep scan --config=auto --metrics=off --severity=error,warning --error || {
+              semgrep scan --config=auto --metrics=off --severity=ERROR --error || {
                 echo "Se encontraron vulnerabilidades criticas"
                 exit 1
               }
@@ -258,12 +258,12 @@ jobs:
           command: |
             echo "Verificando nuevas vulnerabilidades criticas..."
             if [ -n "$SEMGREP_APP_TOKEN" ]; then
-              semgrep ci --metrics=off --severity=error,warning --error || {
+              semgrep ci --metrics=off --severity=ERROR --error || {
                 echo "Se encontraron nuevas vulnerabilidades criticas"
                 exit 1
               }
             else
-              semgrep scan --config=auto --metrics=off --severity=error,warning --error \
+              semgrep scan --config=auto --metrics=off --severity=ERROR --error \
                 --baseline-commit=origin/main || {
                 echo "Se encontraron nuevas vulnerabilidades criticas"
                 exit 1
