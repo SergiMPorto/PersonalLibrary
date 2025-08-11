@@ -162,7 +162,15 @@ jobs:
       - run:
           name: Install git
           command: |
-            apt-get update && apt-get install -y git
+            if command -v apt-get > /dev/null; then
+              apt-get update && apt-get install -y git
+            elif command -v apk > /dev/null; then
+              apk add --no-cache git
+            elif command -v yum > /dev/null; then
+              yum install -y git
+            else
+              echo "Package manager not found, trying to continue without installing git"
+            fi
       - run:
           name: Semgrep FULL report
           command: |
@@ -209,7 +217,15 @@ jobs:
       - run:
           name: Install git
           command: |
-            apt-get update && apt-get install -y git
+            if command -v apt-get > /dev/null; then
+              apt-get update && apt-get install -y git
+            elif command -v apk > /dev/null; then
+              apk add --no-cache git
+            elif command -v yum > /dev/null; then
+              yum install -y git
+            else
+              echo "Package manager not found, trying to continue without installing git"
+            fi
       - run:
           name: Fetch baseline branch
           command: |
