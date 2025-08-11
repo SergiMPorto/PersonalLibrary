@@ -177,13 +177,13 @@ jobs:
             echo "Ejecutando analisis completo con Semgrep..."
             if [ -n "$SEMGREP_APP_TOKEN" ]; then
               echo "Usando Semgrep App token"
-              semgrep ci  --sarif > semgrep-full.sarif || {
+              semgrep ci  --sarif --output=semgrep-full.sarif . || {
                 echo "Semgrep encontro issues, continuando..."
                 exit 0
               }
             else
               echo "Usando reglas publicas"
-              semgrep scan --config=p/security-audit --sarif > semgrep-full.sarif || {
+              semgrep --config=p/security-audit --sarif --output=semgrep-full.sarif . || {
                 echo "Semgrep encontro issues, continuando..."
                 exit 0
               }
@@ -202,7 +202,7 @@ jobs:
                 exit 1
               }
             else
-              semgrep scan --config=p/security-audit --severity=ERROR --error || {
+              semgrep --config=p/security-audit --severity=ERROR --error || {
                 echo "Se encontraron vulnerabilidades criticas"
                 exit 1
               }
@@ -236,15 +236,15 @@ jobs:
             echo "Ejecutando analisis diff con Semgrep..."
             if [ -n "$SEMGREP_APP_TOKEN" ]; then
               echo "Usando Semgrep App token con baseline"
-              semgrep ci  --sarif > semgrep-diff.sarif || {
+              semgrep ci  --sarif --output=semgrep-diff.sarif . || {
                 echo "Semgrep encontro issues en diff, continuando..."
                 exit 0
               }
             else
               echo "Usando reglas publicas con baseline"
-              semgrep scan --config=p/security-audit \
+              semgrep --config=p/security-audit \
                 --baseline-commit=origin/main \
-                --sarif > semgrep-diff.sarif || {
+                --sarif --output=semgrep-diff.sarif . || {
                 echo "Semgrep encontro issues en diff, continuando..."
                 exit 0
               }
@@ -263,7 +263,7 @@ jobs:
                 exit 1
               }
             else
-              semgrep scan --config=p/security-audit --severity=ERROR --error \
+              semgrep --config=p/security-audit --severity=ERROR --error \
                 --baseline-commit=origin/main || {
                 echo "Se encontraron nuevas vulnerabilidades criticas"
                 exit 1
