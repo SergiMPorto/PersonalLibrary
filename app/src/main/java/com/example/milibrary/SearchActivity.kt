@@ -29,6 +29,7 @@ class SearchActivity : ComponentActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var scanButton: Button
     private lateinit var buttonMyLibrary: Button
+    private lateinit var buttonConnectionTest: Button
 
     // Scanner launcher
     private val scanLauncher: ActivityResultLauncher<ScanOptions> = registerForActivityResult(ScanContract()) { result ->
@@ -69,6 +70,7 @@ class SearchActivity : ComponentActivity() {
         scanButton = findViewById(R.id.scanButton)
         buttonMyLibrary = findViewById(R.id.buttonMyLibrary)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        buttonConnectionTest = findViewById(R.id.buttonTestConnection)
     }
 
     private fun setupClickListeners() {
@@ -93,7 +95,18 @@ class SearchActivity : ComponentActivity() {
         scanButton.setOnClickListener {
             checkCameraPermission()
         }
+        buttonMyLibrary.setOnClickListener {
+            val intent = Intent(this, MyLibraryActivity::class.java)
+            startActivity(intent)
+        }
+         buttonConnectionTest.setOnClickListener {
+             val intent = Intent(this, ConnectionTestActivity::class.java)
+             startActivity(intent)
+         }
+
+
     }
+
 
     private fun setupRecyclerView() {
         bookAdapter = BookAdapter(booksList) { selectedBook ->

@@ -25,7 +25,7 @@ object RetrofitClient {
     // 3. IP Local de la máquina anfitriona: Si accedes desde un dispositivo físico en la misma red Wi-Fi,
     //    o si Minikube expone el servicio a tu IP local directamente (como con '--address=0.0.0.0' en port-forward).
     //    ¡Importante! Cambia esta IP por la IP real de tu máquina en tu red local (ej. ipconfig/ifconfig).
-    private const val MY_LOCAL_NETWORK_IP_URL = "http://192.168.1.96:8081/"
+    private const val MY_LOCAL_NETWORK_IP_URL = "http://192.168.1.96:8080/"
 
     // URL actualmente seleccionada para el backend de Mi Biblioteca.
     // Puedes cambiarla aquí o hacerla configurable.
