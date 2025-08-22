@@ -1,0 +1,21 @@
+grafana:
+  adminUser: admin
+  adminPassword: admin1234
+  service:
+    type: NodePort        # en Minikube es cómodo; cambia a LoadBalancer/Ingress si quieres
+  persistence:
+    enabled: true
+    size: 5Gi
+  defaultDashboardsTimezone: browser
+
+prometheus:
+  prometheusSpec:
+    scrapeInterval: 15s
+    serviceMonitorNamespaceSelector: {}   # permite SM en otros namespaces
+    serviceMonitorSelector: {}
+    podMonitorNamespaceSelector: {}
+    podMonitorSelector: {}
+
+alertmanager:
+  alertmanagerSpec:
+    replicas: 1

@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: milibrary-api
+  namespace: pgtest
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.milibrary.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: milibrary-api-api-service
+            port:
+              number: 8000

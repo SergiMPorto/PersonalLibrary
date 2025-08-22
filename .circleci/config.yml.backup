@@ -1,0 +1,280 @@
+version: 2.1
+
+parameters:
+  default_branch:
+    type: string
+    default: main
+
+orbs:
+  sonarcloud: sonarsource/sonarcloud@2.0.0
+  snyk: snyk/snyk@1.5.0
+
+executors:
+  android-executor:
+    docker:
+      - image: cimg/android:2025.04
+    working_directory: ~/library-app
+    environment:
+      GRADLE_OPTS: -Xmx3200m -Dorg.gradle.daemon=false
+      JVM_OPTS: -Xmx3200m
+
+commands:
+  fix-gradlew:
+    description: "Establece permisos de ejecución para gradlew y corrige line endings"
+    steps:
+      - run:
+          name: Fix gradlew permissions and line endings
+          command: |
+            sed -i 's/\r$//' gradlew
+            chmod +x gradlew
+
+  restore-gradle-cache:
+    steps:
+      - restore_cache:
+          keys:
+            - v1-gradle-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+            - v1-gradle-
+
+  save-gradle-cache:
+    steps:
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+          key: v1-gradle-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+
+jobs:
+  build:
+    executor: android-executor
+    steps:
+      - checkout
+      - run:
+          name: Crear local.properties
+          command: echo "sdk.dir=/opt/android/sdk" > local.properties
+      - fix-gradlew
+      - restore-gradle-cache
+      - run:
+          name: Analisis estatico
+          command: |
+            echo "Iniciando analisis estatico..."
+            
+            ./gradlew detekt ktlintCheck spotlessCheck || {
+              echo "Se encontraron problemas de calidad"
+              echo "Revisa los reportes en los artifacts"
+              exit 0
+            }
+            
+            echo "Analisis completado sin problemas"
+      - save-gradle-cache
+      - store_artifacts:
+          path: build/reports
+          destination: static-analysis-reports
+      - store_artifacts:
+          path: build/reports/detekt
+          destination: detekt-reports
+
+  build-and-test:
+    executor: android-executor
+    steps:
+      - checkout
+      - run:
+          name: Crear local.properties
+          command: echo "sdk.dir=/opt/android/sdk" > local.properties
+      - fix-gradlew
+      - restore-gradle-cache
+      - run:
+          name: Ejecutar tests y generar reportes
+          command: |
+            ./gradlew testDebugUnitTest
+            ./gradlew koverXmlReport
+      - run:
+          name: Verificar reportes Kover generados
+          command: |
+            echo "=== Buscando reportes Kover ==="
+            find build -path "*/kover/*" -name "*.xml" -type f 2>/dev/null || echo "No se encontraron reportes Kover"
+            echo "=== Estructura de reports ==="
+            ls -la build/reports/ 2>/dev/null || echo "No hay directorio reports"
+      - save-gradle-cache
+      - run:
+          name: Preparar workspace con reportes Kover
+          command: |
+            mkdir -p tmp-workspace
+            
+            if [ -f "build/reports/kover/xml/report.xml" ]; then
+              echo "Encontrado reporte Kover"
+              cp build/reports/kover/xml/report.xml tmp-workspace/kover-report.xml
+            else
+              echo "No se encontro reporte Kover, creando archivo dummy"
+              echo "<coverage></coverage>" > tmp-workspace/dummy-coverage.xml
+            fi
+            
+            echo "=== Archivos a persistir ==="
+            ls -la tmp-workspace/
+      - store_test_results:
+          path: build/test-results
+      - store_artifacts:
+          path: build/reports
+          destination: kover-reports
+      - persist_to_workspace:
+          root: tmp-workspace
+          paths:
+            - "*.xml"
+
+  sonarcloud-analysis:
+    docker:
+      - image: sonarsource/sonar-scanner-cli:latest
+    steps:
+      - checkout
+      - attach_workspace:
+          at: tmp-workspace
+      - run:
+          name: SonarCloud analysis
+          command: |
+            sonar-scanner \
+              -Dsonar.projectKey=SergiMPorto_PersonalLibrary \
+              -Dsonar.organization=sergimporto \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.token=$SONAR_TOKEN \
+              -Dsonar.sources=src/main \
+              -Dsonar.tests=src/test \
+              -Dsonar.java.binaries=build/intermediates/javac \
+              -Dsonar.coverage.jacoco.xmlReportPaths=tmp-workspace/kover-report.xml
+
+  snyk-security-scan:
+    docker:
+      - image: snyk/snyk:gradle-jdk17
+    steps:
+      - checkout
+      - run:
+          name: Snyk security scan
+          command: |
+            snyk auth $SNYK_TOKEN
+            snyk test --all-projects --severity-threshold=none --json > snyk-results.json || true
+      - store_artifacts:
+          path: snyk-results.json
+          destination: security-reports
+
+  semgrep-full-scan:
+    docker:
+      - image: semgrep/semgrep:latest
+    steps:
+      - checkout
+      - run:
+          name: Install git
+          command: |
+            apt-get update && apt-get install -y git
+      - run:
+          name: Semgrep FULL report
+          command: |
+            echo "Ejecutando analisis completo con Semgrep..."
+            if [ -n "$SEMGREP_APP_TOKEN" ]; then
+              echo "Usando Semgrep App token"
+              semgrep ci --metrics=off --sarif > semgrep-full.sarif || {
+                echo "Semgrep encontro issues, continuando..."
+                exit 0
+              }
+            else
+              echo "Usando reglas publicas"
+              semgrep scan --config=auto --metrics=off --sarif > semgrep-full.sarif || {
+                echo "Semgrep encontro issues, continuando..."
+                exit 0
+              }
+            fi
+            echo "Analisis Semgrep completado"
+      - store_artifacts:
+          path: semgrep-full.sarif
+          destination: sast/semgrep-full.sarif
+      - run:
+          name: Semgrep gate
+          command: |
+            echo "Verificando vulnerabilidades criticas..."
+            if [ -n "$SEMGREP_APP_TOKEN" ]; then
+              semgrep ci --metrics=off --severity=error,warning --exit-code || {
+                echo "Se encontraron vulnerabilidades criticas"
+                exit 1
+              }
+            else
+              semgrep scan --config=auto --metrics=off --severity=error,warning --exit-code || {
+                echo "Se encontraron vulnerabilidades criticas"
+                exit 1
+              }
+            fi
+            echo "No se encontraron vulnerabilidades criticas"
+
+  semgrep-diff-scan:
+    docker:
+      - image: semgrep/semgrep:latest
+    steps:
+      - checkout
+      - run:
+          name: Install git
+          command: |
+            apt-get update && apt-get install -y git
+      - run:
+          name: Fetch baseline branch
+          command: |
+            git fetch origin main:refs/remotes/origin/main
+      - run:
+          name: Semgrep DIFF report
+          command: |
+            echo "Ejecutando analisis diff con Semgrep..."
+            if [ -n "$SEMGREP_APP_TOKEN" ]; then
+              echo "Usando Semgrep App token con baseline"
+              semgrep ci --metrics=off --sarif > semgrep-diff.sarif || {
+                echo "Semgrep encontro issues en diff, continuando..."
+                exit 0
+              }
+            else
+              echo "Usando reglas publicas con baseline"
+              semgrep scan --config=auto --metrics=off \
+                --baseline-commit=origin/main \
+                --sarif > semgrep-diff.sarif || {
+                echo "Semgrep encontro issues en diff, continuando..."
+                exit 0
+              }
+            fi
+            echo "Analisis Semgrep diff completado"
+      - store_artifacts:
+          path: semgrep-diff.sarif
+          destination: sast/semgrep-diff.sarif
+      - run:
+          name: Semgrep DIFF gate
+          command: |
+            echo "Verificando nuevas vulnerabilidades criticas..."
+            if [ -n "$SEMGREP_APP_TOKEN" ]; then
+              semgrep ci --metrics=off --severity=error,warning --exit-code || {
+                echo "Se encontraron nuevas vulnerabilidades criticas"
+                exit 1
+              }
+            else
+              semgrep scan --config=auto --metrics=off --severity=error,warning --exit-code \
+                --baseline-commit=origin/main || {
+                echo "Se encontraron nuevas vulnerabilidades criticas"
+                exit 1
+              }
+            fi
+            echo "No se encontraron nuevas vulnerabilidades criticas"
+
+workflows:
+  library-ci:
+    jobs:
+      - build
+      - build-and-test:
+          requires:
+            - build
+      - sonarcloud-analysis:
+          requires:
+            - build-and-test
+      - snyk-security-scan:
+          requires:
+            - build-and-test
+      - semgrep-full-scan:
+          filters:
+            branches:
+              only:
+                - main
+      - semgrep-diff-scan:
+          filters:
+            branches:
+              ignore:
+                - main

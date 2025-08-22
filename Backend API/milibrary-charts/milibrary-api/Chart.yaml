@@ -1,0 +1,7 @@
+apiVersion: v2
+name: milibrary-api
+description: Helm chart for deploy Milibrary API in Phyton (FastAPI)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+

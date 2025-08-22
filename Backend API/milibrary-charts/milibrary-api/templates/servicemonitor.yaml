@@ -1,0 +1,23 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}-sm
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.metadata.app }}
+    release: monitoring  
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.metadata.app }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  endpoints:
+    - port: {{ .Values.service.name }}   # "metrics" según tu values
+      path: /metrics
+      interval: 15s
+      scheme: http
+{{- end }}
+
