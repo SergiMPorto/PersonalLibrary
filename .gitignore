@@ -13,4 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
-"Backend API/milibrary-charts/milibrary-postgres/values.yaml" 
+Backend API/milibrary-charts/milibrary-postgres/values.yaml
+**/values.yaml
+values.yaml
