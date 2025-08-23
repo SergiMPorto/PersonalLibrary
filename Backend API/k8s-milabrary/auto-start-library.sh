@@ -12,25 +12,25 @@ log() {
 
 # Función para limpiar al salir
 cleanup() {
-    log "🛑 Deteniendo Mi Biblioteca..."
+    log " Deteniendo Mi Biblioteca..."
     if [ -f "$PIDFILE" ]; then
         kill $(cat "$PIDFILE") 2>/dev/null
         rm "$PIDFILE"
     fi
     pkill -f "port-forward.*8080" 2>/dev/null
-    log "✅ Limpieza completada"
+    log " Limpieza completada"
     exit 0
 }
 
 # Configurar trap para limpieza
 trap cleanup SIGTERM SIGINT
 
-log "🚀 Iniciando Mi Biblioteca como servicio..."
+log " Iniciando Mi Biblioteca como servicio..."
 
 # 1. Verificar Minikube
 log "1️⃣ Verificando Minikube..."
 if ! minikube status >/dev/null 2>&1; then
-    log "⚡ Iniciando Minikube..."
+    log " Iniciando Minikube..."
     minikube start --cpus=2 --memory=4096 >>"$LOGFILE" 2>&1
 fi
 
@@ -38,7 +38,7 @@ fi
 log "2️⃣ Esperando Minikube..."
 for i in {1..30}; do
     if kubectl get nodes | grep Ready >/dev/null 2>&1; then
-        log "✅ Minikube listo"
+        log " Minikube listo"
         break
     fi
     sleep 10
@@ -47,7 +47,7 @@ done
 # 3. Aplicar deployment si no existe
 log "3️⃣ Verificando deployment..."
 if ! kubectl get deployment milibrary-api-python -n milibrary >/dev/null 2>&1; then
-    log "📦 Aplicando deployment..."
+    log " Aplicando deployment..."
     kubectl apply -f /home/sergi/k8s-milabrary/api-python/api-local-deploy.yaml >>"$LOGFILE" 2>&1
 fi
 
@@ -55,10 +55,10 @@ fi
 log "4️⃣ Esperando pod..."
 for i in {1..40}; do
     if kubectl get pod -n milibrary -l app=milibrary-api-python | grep Running >/dev/null 2>&1; then
-        log "✅ Pod ejecutándose"
+        log " Pod ejecutándose"
         break
     fi
-    log "⏳ Esperando pod... $i/40"
+    log " Esperando pod... $i/40"
     sleep 15
 done
 
@@ -86,23 +86,23 @@ sleep 10
 
 for i in {1..6}; do
     if timeout 10 curl -f http://$LOCAL_IP:8080/health >/dev/null 2>&1; then
-        log "✅ ¡Mi Biblioteca lista en http://$LOCAL_IP:8080!"
-        log "📱 Servicio funcionando correctamente"
+        log " ¡Mi Biblioteca lista en http://$LOCAL_IP:8080!"
+        log " Servicio funcionando correctamente"
         break
     else
-        log "⏳ Verificando conexión... $i/6"
+        log " Verificando conexión... $i/6"
         sleep 10
     fi
 done
 
 # 8. Mantener el servicio ejecutándose
-log "🎯 Servicio Mi Biblioteca ejecutándose"
-log "📱 URL: http://$LOCAL_IP:8080"
+log " Servicio Mi Biblioteca ejecutándose"
+log " URL: http://$LOCAL_IP:8080"
 
 # Loop infinito para mantener el servicio vivo
 while true; do
     if ! kill -0 $PORT_FORWARD_PID 2>/dev/null; then
-        log "❌ Port-forward se detuvo, reiniciando..."
+        log " Port-forward se detuvo, reiniciando..."
         kubectl port-forward -n milibrary service/milibrary-api-nodeport 8080:8000 --address=0.0.0.0 >>"$LOGFILE" 2>&1 &
         PORT_FORWARD_PID=$!
         echo $PORT_FORWARD_PID > "$PIDFILE"
