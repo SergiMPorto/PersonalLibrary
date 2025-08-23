@@ -1,54 +1,54 @@
 #!/bin/bash
 #start-library.sh - Reiniciar Minikube y recrear Mi Biblioteca desde cero
 
-echo "🔄 REINICIO COMPLETO DE MI BIBLIOTECA"
+echo " REINICIO COMPLETO DE MI BIBLIOTECA"
 echo "===================================="
 BACKUP_FILE="$HOME/milibrary_backup.sql"
 
 # 0. Backup antes de borrar (si existe cluster y DB)
-echo "💾 Haciendo backup de la base de datos si existe..."
+echo " Haciendo backup de la base de datos si existe..."
 if kubectl get pods -n milibrary -l app=postgres 2>/dev/null | grep Running >/dev/null; then
     POD_NAME=$(kubectl get pod -n milibrary -l app=postgres -o jsonpath="{.items[0].metadata.name}")
     kubectl exec -n milibrary "$POD_NAME" -- \
         pg_dump -U library_user milibrary_db > "$BACKUP_FILE"
-    echo "✅ Backup guardado en $BACKUP_FILE"
+    echo " Backup guardado en $BACKUP_FILE"
 else
-    echo "⚠️ No se encontró base de datos en ejecución, no se hará backup."
+    echo " No se encontró base de datos en ejecución, no se hará backup."
 fi
 # 1. Detener y limpiar Minikube
-echo "1️⃣ Deteniendo Minikube..."
+echo " Deteniendo Minikube..."
 minikube stop 2>/dev/null || true
 
-echo "2️⃣ Eliminando cluster corrupto..."
+echo " Eliminando cluster corrupto..."
 minikube delete 2>/dev/null || true
 
-echo "3️⃣ Limpiando cache..."
+echo " Limpiando cache..."
 rm -rf ~/.minikube/cache 2>/dev/null || true
 rm -rf ~/.kube/cache 2>/dev/null || true
 
 # 2. Iniciar Minikube limpio
 minikube start --cpus=2 --memory=2020 --driver=docker
 if [ $? -ne 0 ]; then
-    echo "❌ Error iniciando Minikube"
+    echo " Error iniciando Minikube"
     exit 1
 fi
 
-echo "5️⃣ Verificando Minikube..."
+echo " Verificando Minikube..."
 minikube status
 kubectl get nodes
 
 # 3. Crear namespace
-echo "6️⃣ Creando namespace..."
+echo " Creando namespace..."
 kubectl create namespace milibrary
 
 # 4. Aplicar configuraciones de PostgreSQL
-echo "7️⃣ Desplegando PostgreSQL..."
+echo " Desplegando PostgreSQL..."
 cd ~/k8s-milabrary
 
 # Verificar que los archivos existen
 for file in postgres-secret.yaml postgres-configmap.yaml postgres-pv.yaml postgres-pvc.yaml postgres-deployment.yaml postgres-service.yaml; do
     if [ ! -f "$file" ]; then
-        echo "❌ Archivo $file no encontrado"
+        echo " Archivo $file no encontrado"
         exit 1
     fi
 done
@@ -64,52 +64,52 @@ echo "8️⃣ Esperando que PostgreSQL esté listo..."
 kubectl wait --for=condition=ready pod -l app=postgres -n milibrary --timeout=180s
 
 if [ $? -ne 0 ]; then
-    echo "❌ PostgreSQL no arrancó correctamente"
+    echo " PostgreSQL no arrancó correctamente"
     kubectl get pods -n milibrary
     exit 1
 fi
-echo "⏳ Verificando que PostgreSQL acepte conexiones..."
+echo " Verificando que PostgreSQL acepte conexiones..."
 
 for i in {1..10}; do
     kubectl exec -n milibrary "$POD_NAME" -- \
         psql -U library_user -d milibrary_db -c "\q" 2>/dev/null && break
 
-    echo "🔁 Esperando que PostgreSQL esté disponible... ($i/10)"
+    echo " Esperando que PostgreSQL esté disponible... ($i/10)"
     sleep 5
 done
 
 if [ -f "$BACKUP_FILE" ]; then
-    echo "♻️ Restaurando backup de la base de datos..."
+    echo " Restaurando backup de la base de datos..."
     
 
     POD_NAME=$(kubectl get pod -n milibrary -l app=postgres -o jsonpath="{.items[0].metadata.name}")
-    echo "📦 Pod de PostgreSQL: $POD_NAME"
+    echo " Pod de PostgreSQL: $POD_NAME"
     
 
-    echo "📤 Copiando backup al pod..."
+    echo " Copiando backup al pod..."
     kubectl cp "$BACKUP_FILE" "milibrary/$POD_NAME:/tmp/milibrary_backup.sql"
     if [ $? -ne 0 ]; then
-        echo "❌ Error al copiar el archivo dentro del pod"
+        echo " Error al copiar el archivo dentro del pod"
         exit 1
     fi
 
 
-    echo "📥 Ejecutando restauración con psql..."
+    echo " Ejecutando restauración con psql..."
     kubectl exec -n milibrary "$POD_NAME" -- \
         psql -h localhost -U library_user milibrary_db -f /tmp/milibrary_backup.sql
 
     if [ $? -eq 0 ]; then
-        echo "✅ Backup restaurado correctamente"
+        echo " Backup restaurado correctamente"
         
-        echo "🔎 Verificando tablas restauradas..."
+        echo " Verificando tablas restauradas..."
         kubectl exec -n milibrary "$POD_NAME" -- \
             psql -U library_user -d milibrary_db -c "\dt"
     else
-        echo "❌ Fallo al restaurar la base de datos"
+        echo " Fallo al restaurar la base de datos"
         exit 1
     fi
 else
-    echo "⚠️ No se encontró archivo de backup, base de datos vacía."
+    echo " No se encontró archivo de backup, base de datos vacía."
 fi
 
 

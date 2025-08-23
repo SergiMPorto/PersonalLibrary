@@ -59,7 +59,7 @@ jobs:
             echo "Iniciando analisis estatico..."
             
             ./gradlew detekt ktlintCheck spotlessCheck || {
-              echo "Se encontraron problemas de calidad"
+              echo "Se encontraron problemas en el analisis estatico"
               echo "Revisa los reportes en los artifacts"
               exit 0
             }
