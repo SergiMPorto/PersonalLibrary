@@ -60,7 +60,7 @@ kubectl apply -f postgres-pvc.yaml
 kubectl apply -f postgres-deployment.yaml
 kubectl apply -f postgres-service.yaml
 
-echo "8️⃣ Esperando que PostgreSQL esté listo..."
+echo " Esperando que PostgreSQL esté listo..."
 kubectl wait --for=condition=ready pod -l app=postgres -n milibrary --timeout=180s
 
 if [ $? -ne 0 ]; then
@@ -131,7 +131,7 @@ cd ~/k8s-milabrary/api-python
 
 # Verificar archivos de la API
 if [ ! -f "main.py" ]; then
-    echo "❌ main.py no encontrado. Creando versión básica..."
+    echo " main.py no encontrado. Creando versión básica..."
     cat > main.py << 'EOF'
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -167,9 +167,9 @@ async def get_db_pool():
         }
         try:
             db_pool = await asyncpg.create_pool(**db_config)
-            logger.info("✅ Conexión a base de datos establecida")
+            logger.info(" Conexión a base de datos establecida")
         except Exception as e:
-            logger.error(f"❌ Error conectando a la base de datos: {e}")
+            logger.error(f" Error conectando a la base de datos: {e}")
             raise
     return db_pool
 
@@ -231,7 +231,7 @@ EOF
 fi
 
 if [ ! -f "requirements.txt" ]; then
-    echo "📄 Creando requirements.txt..."
+    echo " Creando requirements.txt..."
     cat > requirements.txt << 'EOF'
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
@@ -245,25 +245,25 @@ fi
 docker build -t milibrary-api-python:v1.1.0 .
 
 if [ $? -ne 0 ]; then
-    echo "❌ Error construyendo imagen"
+    echo " Error construyendo imagen"
     exit 1
 fi
 
-echo "1️⃣1️⃣ Desplegando API..."
+echo "1 Desplegando API..."
 kubectl apply -f api-local-deploy.yaml
 
-echo "1️⃣2️⃣ Esperando que la API esté lista..."
+echo " Esperando que la API esté lista..."
 for i in {1..20}; do
     if kubectl get pod -n milibrary -l app=milibrary-api-python | grep Running > /dev/null; then
-        echo "✅ API está Running!"
+        echo " API está Running!"
         break
     else
-        echo "⏳ Esperando API... $i/20"
+        echo " Esperando API... $i/20"
         sleep 15
     fi
     
     if [ $i -eq 20 ]; then
-        echo "❌ API no arrancó. Verificando estado:"
+        echo " API no arrancó. Verificando estado:"
         kubectl get pods -n milibrary
         kubectl describe pod -n milibrary -l app=milibrary-api-python
         exit 1
@@ -272,7 +272,7 @@ done
 
 # 6. Iniciar port-forward
 LOCAL_IP=$(hostname -I | awk '{print $1}')
-echo "1️⃣3️⃣ Iniciando port-forward..."
+echo " Iniciando port-forward..."
 pkill -f "port-forward.*8080" 2>/dev/null || true
 sleep 3
 
@@ -284,21 +284,21 @@ sleep 10
 
 if curl -f http://$LOCAL_IP:8080/health --max-time 15 >/dev/null 2>&1; then
     echo ""
-    echo "🎉 ¡MI BIBLIOTECA FUNCIONANDO DESDE CERO!"
+    echo " ¡MI BIBLIOTECA FUNCIONANDO DESDE CERO!"
     echo "========================================"
-    echo "📱 URL para Android: http://$LOCAL_IP:8080"
-    echo "🌐 URL para navegador: http://localhost:8080"
-    echo "🔄 Port-forward PID: $PF_PID"
+    echo " URL para Android: http://$LOCAL_IP:8080"
+    echo " URL para navegador: http://localhost:8080"
+    echo " Port-forward PID: $PF_PID"
     echo ""
-    echo "🧪 Prueba:"
+    echo " Prueba:"
     curl -s http://$LOCAL_IP:8080/health | python3 -m json.tool 2>/dev/null || curl -s http://$LOCAL_IP:8080/health
     echo ""
-    echo "🎯 ¡Tu app Android ya puede conectarse!"
+    echo " ¡Tu app Android ya puede conectarse!"
     echo ""
     echo "Presiona Ctrl+C para detener..."
     wait $PF_PID
 else
-    echo "❌ La API no responde"
+    echo " La API no responde"
     kubectl get pods -n milibrary
     kubectl logs -n milibrary -l app=milibrary-api-python --tail=20
     kill $PF_PID 2>/dev/null

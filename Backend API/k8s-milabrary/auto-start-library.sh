@@ -12,7 +12,7 @@ log() {
 
 # Función para limpiar al salir
 cleanup() {
-    log  Deteniendo Mi Biblioteca..."
+    log " Deteniendo Mi Biblioteca..."
     if [ -f "$PIDFILE" ]; then
         kill $(cat "$PIDFILE") 2>/dev/null
         rm "$PIDFILE"
@@ -30,7 +30,7 @@ log " Iniciando Mi Biblioteca como servicio..."
 # 1. Verificar Minikube
 log "1 Verificando Minikube..."
 if ! minikube status >/dev/null 2>&1; then
-    log "⚡ Iniciando Minikube..."
+    log " Iniciando Minikube..."
     minikube start --cpus=2 --memory=4096 >>"$LOGFILE" 2>&1
 fi
 
