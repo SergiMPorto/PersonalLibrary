@@ -13,7 +13,7 @@ executors:
   android-executor:
     docker:
       - image: cimg/android:2025.04
-    working_directory: ~/library-app
+    working_directory: ~/library-app/android-app
     environment:
       GRADLE_OPTS: -Xmx3200m -Dorg.gradle.daemon=false
       JVM_OPTS: -Xmx3200m

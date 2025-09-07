@@ -1,18 +1,26 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Android
+build/
+.gradle/
 local.properties
-Backend API/milibrary-charts/milibrary-postgres/values.yaml
-**/values.yaml
-values.yaml
+*.apk
+*.aab
+
+# Backend  
+__pycache__/
+*.pyc
+.env
+*.log
+*.swp
+*.swo
+
+# IDE
+.idea/
+.vscode/
+
+# Secrets & configs
+secrets/
+*.key
+*.backup
+
+# OS
+.DS_Store

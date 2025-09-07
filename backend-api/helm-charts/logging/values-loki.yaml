@@ -1,0 +1,22 @@
+loki:
+  enabled: true
+  persistence:
+    enabled: false
+  config:
+    limits_config:
+      retention_period: 24h
+    server:
+      http_listen_port: 3100
+      
+promtail:
+  enabled: true
+  config:
+    clients:
+      - url: http://loki:3100/loki/api/v1/push
+
+grafana:
+  enabled: false
+fluent-bit:
+  enabled: false
+prometheus:
+  enabled: false

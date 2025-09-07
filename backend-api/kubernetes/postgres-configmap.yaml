@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: milibrary
+data: 
+  POSTGRES_DB: milibrary_db
+  POSTGRES_USER: library_user
+
+#almace datos no confidenciales en dato valor

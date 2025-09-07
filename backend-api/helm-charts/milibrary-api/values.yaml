@@ -1,0 +1,52 @@
+metadata:
+  app: milibrary-api
+replicaCount: 1
+image:
+  repository: sergimp/milibrary
+  tag: "v1.2.1"
+  pullPolicy: IfNotPresent
+service:
+  type: NodePort
+  port: 8000
+  targetPort: 8000
+  nodePort: 30080
+  portName: metrics
+monitoring:
+  enabled: true
+  namespace: monitoring  
+db:
+  host: "milibrary-postgres-postgres-service.pgtest.svc.cluster.local"
+  port: "5432"
+  name: "milibrary_db"
+  secretName: "milibrary-postgres-postgres-secret"
+  userKey: "username"
+  passwordKey: "password"
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 15
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: api.milibrary.local
+      paths:
+        - path: /
+          pathType: Prefix
