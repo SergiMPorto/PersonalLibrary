@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init
+  namespace: milibrary
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: db-init
+        image: postgres:15
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        command:
+        - /bin/sh
+        - -c
+        - |
+          until pg_isready -h postgres-service -U library_user -d milibrary_db; do
+            echo "Esperando a Postgres..."
+            sleep 3
+          done
+          psql -h postgres-service -U library_user -d milibrary_db -c "
+            CREATE TABLE IF NOT EXISTS books (
+              id               SERIAL PRIMARY KEY,
+              google_books_id  VARCHAR(50) UNIQUE,
+              title            VARCHAR(500) NOT NULL,
+              authors          TEXT,
+              description      TEXT,
+              thumbnail_url    TEXT,
+              date_added       TIMESTAMP DEFAULT NOW(),
+              date_updated     TIMESTAMP DEFAULT NOW()
+            );
+          "
+          echo "Tabla books creada correctamente"
