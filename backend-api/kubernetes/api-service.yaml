@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     app: milibrary-api
-  type: NodePort
+  type: LoadBalancer 
   ports:
   - port: 8000
     targetPort: 8000
