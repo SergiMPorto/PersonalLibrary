@@ -8,7 +8,7 @@ fun Book.toBookCreateRequest(): BookCreateRequest {
     val isbn13 = volumeInfo.industryIdentifiers?.find { it.type == "ISBN_13" }?.identifier
 
     return BookCreateRequest(
-        googleBooksId = null, // Ajustar según tu modelo Book
+        googleBooksId = null,
         title = volumeInfo.title ?: "",
         authors = volumeInfo.authors?.joinToString(", "),
         description = volumeInfo.description,
@@ -29,7 +29,7 @@ private fun Book.generateGoogleBooksId(): String {
     val author = volumeInfo.authors?.firstOrNull()?.replace(" ", "_")?.lowercase() ?: "unknown"
     val isbn = volumeInfo.industryIdentifiers?.firstOrNull()?.identifier ?: System.currentTimeMillis().toString()
 
-    return "${title}_${author}_${isbn}".take(100) // Limitar a 100 caracteres
+    return "${title}_${author}_${isbn}".take(100)
 }
 
 
@@ -112,4 +112,5 @@ fun SavedBook.hasImage(): Boolean {
 
 // Función para obtener la URL de imagen con protocolo seguro
 fun SavedBook.getSecureImageUrl(): String? {
-    return thumbnailUrl?.replace("http://", "https://")}
+    return thumbnailUrl?.replace("http://", "https://")
+}
