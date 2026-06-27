@@ -16,7 +16,7 @@ object RetrofitClient {
 
     // URLs para tu backend Mi Biblioteca:
     // 1. K3s con MetalLB (producción local - Raspberry Pi):
-    private const val K3S_METALLB_URL = "http://192.168.1.201:8000/"
+    private const val K3S_METALLB_URL = "http://192.168.1.200:8000/"
 
     // 2. Port Forward (emulador Android Studio):
     private const val PORT_FORWARD_URL = "http://10.0.2.2:8000/"
