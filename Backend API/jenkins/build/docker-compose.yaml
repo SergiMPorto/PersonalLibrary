@@ -1,6 +1,0 @@
-version: '3'
-services:
-    personal-library-api:
-    image: "personal-library-api:${BUILD_TAG:-latest}"
-    build:
-      context: ../../k8s-milabrary/api-python 

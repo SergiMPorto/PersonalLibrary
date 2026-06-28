@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                dir('Backend API/jenkins/build') {
+                dir('backend-api-app/jenkins/build') {
                     sh 'chmod +x build.sh'
                     sh './build.sh'
                 }
