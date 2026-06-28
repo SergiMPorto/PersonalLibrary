@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+     environment {
+        BUILD_TAG = "${env.BUILD_NUMBER}"
+    }
+
     stages {
         stage('Build') {
             steps {
