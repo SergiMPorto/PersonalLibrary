@@ -5,7 +5,12 @@ local.properties
 *.apk
 *.aab
 
-# Backend  
+# Excepciones Jenkins
+!Backend API/jenkins/build/
+!Backend API/jenkins/build/build.sh
+!Backend API/jenkins/build/docker-compose.yaml
+
+# Backend
 __pycache__/
 *.pyc
 .env
