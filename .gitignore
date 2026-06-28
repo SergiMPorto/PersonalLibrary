@@ -1,14 +1,13 @@
 # Android
-build/
 .gradle/
 local.properties
 *.apk
 *.aab
 
 # Excepciones Jenkins
-!Backend API/jenkins/build/
-!Backend API/jenkins/build/build.sh
-!Backend API/jenkins/build/docker-compose.yaml
+!backend-api-app/jenkins/build/
+!backend-api-app/jenkins/build/build.sh
+!backend-api-app/jenkins/build/docker-compose.yaml
 
 # Backend
 __pycache__/
