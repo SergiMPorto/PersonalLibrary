@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Building...'
+                sh "chmod +x Backend API/jenkins/build/build.sh"
+                sh "Backend API/jenkins/build/build.sh"
             }
         }
 
