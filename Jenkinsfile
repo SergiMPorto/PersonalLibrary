@@ -4,8 +4,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh "chmod +x Backend API/jenkins/build/build.sh"
-                sh "Backend API/jenkins/build/build.sh"
+                sh 'chmod +x "Backend API/jenkins/build/build.sh"'
+                sh '"Backend API/jenkins/build/build.sh"'
             }
         }
 
