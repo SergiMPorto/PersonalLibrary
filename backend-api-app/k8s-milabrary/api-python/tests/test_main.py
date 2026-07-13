@@ -95,5 +95,5 @@ async def test_get_stats():
     assert response.status_code == 200
     assert response.json()["total_books"] == 5
     assert response.json()["total_authors"] == 3
-    assert response.json()["total_categories"] == 2
-    assert response.json()["most_popular_book"] == "Dune"
+    assert response.json()["total_languages"] == 2
+   

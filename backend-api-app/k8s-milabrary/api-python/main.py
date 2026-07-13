@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 import logging
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
- from starlette.responses import PlainTextResponse
+from starlette.responses import PlainTextResponse
 
 
 # Configurar logging
