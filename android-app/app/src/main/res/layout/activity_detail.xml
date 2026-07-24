@@ -1,81 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="16dp"
+<!-- activity_detail.xml — detalle del libro -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/bg">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <ImageView
-            android:id="@+id/imageViewCoverDetail"
-            android:layout_width="150dp"
-            android:layout_height="220dp"
-            android:layout_gravity="center_horizontal"
-            android:scaleType="fitXY"
-            android:contentDescription="Book cover" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
 
-        <TextView
-            android:id="@+id/textViewTitleDetail"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_marginTop="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            <ImageButton
+                android:id="@+id/buttonBackDetail"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_neutral_100"
+                android:padding="9dp"
+                android:src="@drawable/ic_arrow_left"
+                app:tint="@color/text_primary"
+                android:contentDescription="Volver" />
 
-        <TextView
-            android:id="@+id/textViewAuthorDetail"
-            android:textSize="16sp"
-            android:textColor="#666"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="Detalle"
+                android:fontFamily="@font/caprasimo"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:id="@+id/textViewCoverInitialDetail"
+                android:layout_width="120dp"
+                android:layout_height="172dp"
+                android:background="@drawable/rounded_card_elev_background"
+                android:fontFamily="@font/caprasimo"
+                android:textSize="40sp"
+                android:textColor="@color/accent_800"
+                android:gravity="center"
+                tools:text="C" />
+
+            <TextView
+                android:id="@+id/textViewTitleDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:fontFamily="@font/caprasimo"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary"
+                android:gravity="center"
+                tools:text="Cien años de soledad" />
+
+            <TextView
+                android:id="@+id/textViewAuthorDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="14sp"
+                android:textColor="@color/accent_700"
+                tools:text="Gabriel García Márquez" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textViewDescriptionDetail"
-            android:textSize="14sp"
-            android:layout_marginTop="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/textViewPublisherDetail"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/textViewPublishedDateDetail"
-            android:textSize="14sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/textViewPageCountDetail"
-            android:textSize="14sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/textViewLanguageDetail"
-            android:textSize="14sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/buttonSaveBook"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="Guardar en Mi Biblioteca"
-            android:background="@color/teal_200"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:padding="12dp"
+            android:layout_marginTop="12dp"
+            android:textSize="13.5sp"
+            android:lineSpacingMultiplier="1.5"
+            android:textColor="@color/text_primary"
+            tools:text="La saga de la familia Buendía en el pueblo mítico de Macondo…" />
 
-            android:drawablePadding="8dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_card_background"
+            android:padding="16dp"
+            android:layout_marginTop="16dp">
 
+            <include layout="@layout/row_detail_field" android:id="@+id/rowPublisher" />
+            <include layout="@layout/row_detail_field" android:id="@+id/rowPublishedDate" />
+            <include layout="@layout/row_detail_field" android:id="@+id/rowPageCount" />
+            <include layout="@layout/row_detail_field" android:id="@+id/rowLanguage" />
+            <include layout="@layout/row_detail_field" android:id="@+id/rowIsbn" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonDeleteBook"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Eliminar de mi biblioteca"
+            android:textAllCaps="false"
+            android:textColor="@color/text_primary"
+            android:fontFamily="@font/caprasimo"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="@color/divider"
+            app:cornerRadius="16dp" />
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

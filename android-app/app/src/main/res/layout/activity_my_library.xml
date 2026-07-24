@@ -1,126 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<!-- Pantalla principal — Mi Biblioteca -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    tools:contex=".MyLibraryActivity">
+    android:background="@color/bg"
+    tools:context=".MyLibraryActivity">
 
-    <TextView
-        android:id="@+id/textViewTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="📚 Mi Biblioteca"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/teal_700"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <!-- Estadísticas de la biblioteca -->
-    <TextView
-        android:id="@+id/textViewStats"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="📚 0 libros | ✍️ 0 autores | 🌍 0 idiomas"
-        android:textSize="14sp"
-        android:textColor="@color/teal_200"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewTitle" />
-
-    <!-- Campo de búsqueda -->
-    <EditText
-        android:id="@+id/editTextSearchMyLibrary"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:hint="Buscar en mi biblioteca..."
-        android:inputType="text"
-        android:drawableStart="@android:drawable/ic_menu_search"
-        android:drawablePadding="8dp"
-        android:padding="12dp"
-        android:background="@drawable/edittext_background"
-        app:layout_constraintEnd_toStartOf="@id/buttonSearchMyLibrary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewStats" />
-
-    <!-- Botón de búsqueda -->
-    <Button
-        android:id="@+id/buttonSearchMyLibrary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="Buscar"
-        android:textSize="12sp"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintBottom_toBottomOf="@id/editTextSearchMyLibrary"
-        app:layout_constraintEnd_toStartOf="@id/buttonShowAll"
-        app:layout_constraintTop_toTopOf="@id/editTextSearchMyLibrary" />
-
-    <!-- Botón mostrar todos -->
-    <Button
-        android:id="@+id/buttonShowAll"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Todos"
-        android:textSize="12sp"
-        android:paddingHorizontal="16dp"
-        android:backgroundTint="@color/teal_200"
-        app:layout_constraintBottom_toBottomOf="@id/editTextSearchMyLibrary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/editTextSearchMyLibrary" />
-
-    <!-- SwipeRefreshLayout que contiene el RecyclerView -->
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextSearchMyLibrary">
-
-        <!-- RecyclerView para mostrar los libros -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewMyLibrary"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            tools:listitem="@layout/item_saved_book" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mi Biblioteca"
+                android:fontFamily="@font/caprasimo"
+                android:textSize="26sp"
+                android:textColor="@color/text_primary" />
 
-    <!-- Indicador de carga -->
-    <ProgressBar
-        android:id="@+id/progressBarMyLibrary"
+            <TextView
+                android:id="@+id/textViewStats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="3 libros · 3 autores"
+                android:textSize="13sp"
+                android:textColor="@color/accent_700" />
+
+            <!-- Buscador -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxBackgroundColor="@color/surface"
+                app:boxStrokeWidth="0dp"
+                app:startIconDrawable="@drawable/ic_search"
+                app:startIconTint="@color/accent_700"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextSearchMyLibrary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Buscar en mi biblioteca..."
+                    android:inputType="text"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/neutral_600" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Orden: Reciente / Título / Autor -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupSort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipSortRecent"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Reciente"
+                    android:textColor="@color/accent_800"
+                    app:chipBackgroundColor="@drawable/chip_background"
+                    app:chipStrokeWidth="0dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipSortTitle"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Título"
+                    android:textColor="@color/neutral_700"
+                    app:chipBackgroundColor="@drawable/chip_background"
+                    app:chipStrokeWidth="0dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipSortAuthor"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Autor"
+                    android:textColor="@color/neutral_700"
+                    app:chipBackgroundColor="@drawable/chip_background"
+                    app:chipStrokeWidth="0dp" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <!-- Lista de libros guardados -->
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewMyLibrary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_saved_book" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <!-- Estado vacío -->
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <View
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/circle_accent2_100" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Tu biblioteca está vacía"
+                    android:fontFamily="@font/caprasimo"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="240dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="Pulsa el botón + para añadir tu primer libro por título o ISBN."
+                    android:textSize="13sp"
+                    android:textColor="@color/neutral_700" />
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBarMyLibrary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:indeterminateTint="@color/accent" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- FAB: añadir libro -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddBook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextSearchMyLibrary" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:contentDescription="Añadir libro"
+        android:src="@drawable/ic_plus"
+        app:tint="@color/white"
+        app:backgroundTint="@color/accent"
+        app:fabSize="normal"
+        app:elevation="8dp" />
 
-    <!-- Mensaje cuando la lista está vacía -->
-    <TextView
-        android:id="@+id/textViewEmpty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="📚 Tu biblioteca está vacía\n\n¡Comienza agregando algunos libros!"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:textColor="@color/teal_200"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextSearchMyLibrary" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
