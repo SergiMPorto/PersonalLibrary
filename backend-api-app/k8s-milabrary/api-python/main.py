@@ -1,3 +1,5 @@
+
+
 # main.py - API FastAPI completa y simplificada
 from fastapi import FastAPI, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +11,8 @@ from datetime import datetime
 import time
 import logging
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+from starlette.responses import PlainTextResponse
+
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -41,7 +45,7 @@ class Book(BookBase):
     id: int
     date_added: datetime
     date_updated: datetime
-
+    
     class Config:
         from_attributes = True
         populate_by_name = True
@@ -172,7 +176,7 @@ async def health_check(db: asyncpg.Connection = Depends(get_db)):
     try:
         await db.fetchval("SELECT 1")
         return HealthCheck(
-            status="healthy",
+            status="healthy", 
             timestamp=datetime.now(),
             database_status="connected"
         )
@@ -191,23 +195,23 @@ async def get_books(
     try:
         if search:
             query = """
-                SELECT * FROM books
-                WHERE title ILIKE '%' || $1 || '%'
+                SELECT * FROM books 
+                WHERE title ILIKE '%' || $1 || '%' 
                    OR authors ILIKE '%' || $1 || '%'
                    OR description ILIKE '%' || $1 || '%'
                    OR categories ILIKE '%' || $1 || '%'
-                ORDER BY date_added DESC
+                ORDER BY date_added DESC 
                 LIMIT $2 OFFSET $3
             """
             rows = await db.fetch(query, search, limit, offset)
         else:
             query = """
-                SELECT * FROM books
-                ORDER BY date_added DESC
+                SELECT * FROM books 
+                ORDER BY date_added DESC 
                 LIMIT $1 OFFSET $2
             """
             rows = await db.fetch(query, limit, offset)
-
+        
         return [dict(row) for row in rows]
     except Exception as e:
         logger.error(f"Error obteniendo libros: {e}")
@@ -223,29 +227,29 @@ async def create_book(book: BookCreate, db: asyncpg.Connection = Depends(get_db)
                 "SELECT id FROM books WHERE google_books_id = $1",
                 book.google_books_id
             )
-
+            
             if existing:
                 raise HTTPException(status_code=409, detail="El libro ya está guardado")
-
+        
         # Insertar nuevo libro
         query = """
-            INSERT INTO books
-            (google_books_id, title, authors, description, thumbnail_url,
+            INSERT INTO books 
+            (google_books_id, title, authors, description, thumbnail_url, 
              publisher, published_date, page_count, language, isbn_10, isbn_13, categories)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             RETURNING *
         """
-
+        
         row = await db.fetchrow(
             query,
             book.google_books_id, book.title, book.authors, book.description,
             book.thumbnail_url, book.publisher, book.published_date,
             book.page_count, book.language, book.isbn_10, book.isbn_13, book.categories
         )
-
+        
         logger.info(f"✅ Libro guardado: {book.title}")
         return dict(row)
-
+            
     except HTTPException:
         raise
     except Exception as e:
@@ -257,13 +261,13 @@ async def get_book(book_id: int, db: asyncpg.Connection = Depends(get_db)):
     """Obtener un libro específico por ID"""
     try:
         row = await db.fetchrow(
-            "SELECT * FROM books WHERE id = $1",
+            "SELECT * FROM books WHERE id = $1", 
             book_id
         )
-
+        
         if not row:
             raise HTTPException(status_code=404, detail="Libro no encontrado")
-
+        
         return dict(row)
     except HTTPException:
         raise
@@ -279,34 +283,34 @@ async def update_book(book_id: int, book: BookUpdate, db: asyncpg.Connection = D
         update_fields = []
         values = []
         param_count = 1
-
+        
         book_dict = book.model_dump(exclude_unset=True, by_alias=False)
-
+        
         for field, value in book_dict.items():
             if value is not None:
                 update_fields.append(f"{field} = ${param_count}")
                 values.append(value)
                 param_count += 1
-
+        
         if not update_fields:
             raise HTTPException(status_code=400, detail="No hay campos para actualizar")
-
+        
         values.append(book_id)  # ID para la cláusula WHERE
-
+        
         query = f"""
             UPDATE books SET {', '.join(update_fields)}
             WHERE id = ${param_count}
             RETURNING *
         """
-
+        
         row = await db.fetchrow(query, *values)
-
+        
         if not row:
             raise HTTPException(status_code=404, detail="Libro no encontrado")
-
+        
         logger.info(f"✅ Libro actualizado: ID {book_id}")
         return dict(row)
-
+        
     except HTTPException:
         raise
     except Exception as e:
@@ -318,13 +322,13 @@ async def delete_book(book_id: int, db: asyncpg.Connection = Depends(get_db)):
     """Eliminar un libro de la biblioteca"""
     try:
         row = await db.fetchrow(
-            "DELETE FROM books WHERE id = $1 RETURNING title",
+            "DELETE FROM books WHERE id = $1 RETURNING title", 
             book_id
         )
-
+        
         if not row:
             raise HTTPException(status_code=404, detail="Libro no encontrado")
-
+        
         logger.info(f"✅ Libro eliminado: {row['title']}")
         return {"message": f"Libro '{row['title']}' eliminado correctamente"}
     except HTTPException:
@@ -338,13 +342,13 @@ async def get_book_by_google_id(google_books_id: str, db: asyncpg.Connection = D
     """Obtener un libro por su Google Books ID"""
     try:
         row = await db.fetchrow(
-            "SELECT * FROM books WHERE google_books_id = $1",
+            "SELECT * FROM books WHERE google_books_id = $1", 
             google_books_id
         )
-
+        
         if not row:
             raise HTTPException(status_code=404, detail="Libro no encontrado")
-
+        
         return dict(row)
     except HTTPException:
         raise
@@ -358,30 +362,30 @@ async def get_library_stats(db: asyncpg.Connection = Depends(get_db)):
     try:
         # Consultas simples y seguras
         total_books = await db.fetchval("SELECT COUNT(*) FROM books")
-
+        
         total_authors = await db.fetchval("""
-            SELECT COUNT(DISTINCT authors) FROM books
+            SELECT COUNT(DISTINCT authors) FROM books 
             WHERE authors IS NOT NULL AND authors != ''
         """)
-
+        
         total_languages = await db.fetchval("""
-            SELECT COUNT(DISTINCT language) FROM books
+            SELECT COUNT(DISTINCT language) FROM books 
             WHERE language IS NOT NULL AND language != ''
         """)
-
+        
         most_recent_book = await db.fetchval("""
-            SELECT title FROM books
-            ORDER BY date_added DESC
+            SELECT title FROM books 
+            ORDER BY date_added DESC 
             LIMIT 1
         """)
-
+        
         return LibraryStats(
             total_books=total_books or 0,
             total_authors=total_authors or 0,
             total_languages=total_languages or 0,
             most_recent_book=most_recent_book
         )
-
+        
     except Exception as e:
         logger.error(f"Error obteniendo estadísticas: {e}")
         raise HTTPException(status_code=500, detail=f"Error al obtener estadísticas: {str(e)}")
@@ -392,24 +396,24 @@ async def get_authors(db: asyncpg.Connection = Depends(get_db)):
     try:
         rows = await db.fetch(
             """
-            SELECT DISTINCT authors
-            FROM books
+            SELECT DISTINCT authors 
+            FROM books 
             WHERE authors IS NOT NULL AND authors != ''
             ORDER BY authors
             """
         )
-
+        
         authors = []
         for row in rows:
             if row['authors']:
                 # Separar autores si hay múltiples (separados por comas)
                 book_authors = [author.strip() for author in row['authors'].split(',')]
                 authors.extend(book_authors)
-
+        
         # Eliminar duplicados y ordenar
         unique_authors = sorted(list(set(filter(None, authors))))
         return unique_authors
-
+        
     except Exception as e:
         logger.error(f"Error obteniendo autores: {e}")
         raise HTTPException(status_code=500, detail=f"Error al obtener autores: {str(e)}")
@@ -420,24 +424,24 @@ async def get_categories(db: asyncpg.Connection = Depends(get_db)):
     try:
         rows = await db.fetch(
             """
-            SELECT DISTINCT categories
-            FROM books
+            SELECT DISTINCT categories 
+            FROM books 
             WHERE categories IS NOT NULL AND categories != ''
             ORDER BY categories
             """
         )
-
+        
         categories = []
         for row in rows:
             if row['categories']:
                 # Separar categorías si hay múltiples (separados por comas)
                 book_categories = [cat.strip() for cat in row['categories'].split(',')]
                 categories.extend(book_categories)
-
+        
         # Eliminar duplicados y ordenar
         unique_categories = sorted(list(set(filter(None, categories))))
         return unique_categories
-
+        
     except Exception as e:
         logger.error(f"Error obteniendo categorías: {e}")
         raise HTTPException(status_code=500, detail=f"Error al obtener categorías: {str(e)}")
@@ -450,35 +454,35 @@ async def test_table(db: asyncpg.Connection = Depends(get_db)):
         # Verificar que la tabla existe
         table_exists = await db.fetchval("""
             SELECT EXISTS (
-                SELECT FROM information_schema.tables
-                WHERE table_schema = 'public'
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'public' 
                 AND table_name = 'books'
             )
         """)
-
+        
         if not table_exists:
             return {"error": "La tabla 'books' no existe"}
-
+        
         # Verificar estructura de la tabla
         columns = await db.fetch("""
-            SELECT column_name, data_type
-            FROM information_schema.columns
+            SELECT column_name, data_type 
+            FROM information_schema.columns 
             WHERE table_name = 'books'
             ORDER BY ordinal_position
         """)
-
+        
         column_info = [{"name": col["column_name"], "type": col["data_type"]} for col in columns]
-
+        
         # Contar registros
         count = await db.fetchval("SELECT COUNT(*) FROM books")
-
+        
         return {
             "table_exists": table_exists,
             "columns": column_info,
             "total_records": count,
             "status": "success"
         }
-
+        
     except Exception as e:
         logger.error(f"Error en test de tabla: {e}")
         return {"error": f"Error verificando tabla: {str(e)}"}
@@ -486,31 +490,18 @@ async def test_table(db: asyncpg.Connection = Depends(get_db)):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=int(os.getenv("PORT", "8000")),
+        "main:app", 
+        host="0.0.0.0", 
+        port=int(os.getenv("PORT", "8000")), 
         reload=False
     )
 @app.get("/metrics")
 async def metrics():
     """Endpoint para métricas de Prometheus"""
     try:
-        # Actualizar métricas específicas de la aplicación
-        pool = await get_db_pool()
-        async with pool.acquire() as connection:
-            # Obtener número total de libros
-            total_books = await connection.fetchval("SELECT COUNT(*) FROM books")
-            books_total.set(total_books or 0)
-
-            # Métricas de conexiones de DB
-            if hasattr(pool, '_con'):
-                database_connections.set(len(pool._con))
-            else:
-                database_connections.set(pool.get_size())
-
+        from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+        from starlette.responses import Response
+        return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
     except Exception as e:
-        logger.error(f"Error updating metrics: {e}")
-        # No fallar si hay error en métricas
-
-    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
-
+        logger.error(f"Error in metrics: {e}")
+        return {"error": "Metrics not available"}
