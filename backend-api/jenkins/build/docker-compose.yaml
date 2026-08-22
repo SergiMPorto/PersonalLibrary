@@ -1,0 +1,6 @@
+version: '3'
+services:
+  personal-library-api:
+    build:
+      context: ../../api
+    image: "personal-library-api:${BUILD_TAG:-latest}"

@@ -1,24 +1,26 @@
 pipeline {
     agent any
 
-     environment {
+    environment {
         BUILD_TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
-        stage('Build') {
+        stage('Test') {
             steps {
-                dir('backend-api-app/jenkins/build') {
-                    sh 'chmod +x build.sh'
-                    sh './build.sh'
+                dir('backend-api/jenkins/test') {
+                    sh 'chmod +x test.sh'
+                    sh './test.sh'
                 }
-             
             }
         }
 
-        stage('Test') {
+        stage('Build') {
             steps {
-                echo 'Testing...'
+                dir('backend-api/jenkins/build') {
+                    sh 'chmod +x build.sh'
+                    sh './build.sh'
+                }
             }
         }
 
