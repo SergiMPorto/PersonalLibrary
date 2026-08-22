@@ -1,0 +1,16 @@
+version: 2.1
+
+jobs:
+  placeholder:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Pipeline pendiente de implementar
+          command: echo "CI configurado. Etapas de test y build por añadir."
+
+workflows:
+  ci:
+    jobs:
+      - placeholder
