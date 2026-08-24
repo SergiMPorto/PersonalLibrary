@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+
         stage('Test') {
             steps {
                 dir('backend-api/jenkins/test') {
@@ -17,9 +18,26 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir('backend-api/jenkins/build') {
-                    sh 'chmod +x build.sh'
-                    sh './build.sh'
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'docker-hub-credentials',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
+                    dir('backend-api/jenkins/build') {
+                        sh 'chmod +x build.sh'
+                        sh './build.sh'
+                    }
+                }
+            }
+
+            post {
+                success {
+                    echo "Build ${BUILD_TAG} completed successfully."
+                }
+                failure {
+                    echo "Build ${BUILD_TAG} failed."
                 }
             }
         }
