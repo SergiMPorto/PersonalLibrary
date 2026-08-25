@@ -9,7 +9,7 @@ docker compose -f docker-compose.yaml build --no-cache
 
 docker tag "sergimp/milibrary:${BUILD_TAG}" "sergimp/milibrary:latest"
 
-echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" -password-stdin
 docker push "sergimp/milibrary:${BUILD_TAG}"
 docker push "sergimp/milibrary:latest"
 
