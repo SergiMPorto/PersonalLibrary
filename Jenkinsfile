@@ -44,7 +44,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                dir('banckend-api/jenkins/deploy') {
+                dir('backend-api/jenkins/deploy') {
                     sh 'chmod +x deploy.sh'
                     sh './deploy.sh'
                 }
