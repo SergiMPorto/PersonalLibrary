@@ -44,7 +44,18 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deploying...'
+                dir('banckend-api/jenkins/deploy') {
+                    sh 'chmod +x deploy.sh'
+                    sh './deploy.sh'
+                }
+            }
+            post {
+                success {
+                    echo "Deployment of build ${BUILD_TAG} completed successfully."
+                }
+                failure {
+                    echo "Deployment of build ${BUILD_TAG} failed."
+                }
             }
         }
     }
