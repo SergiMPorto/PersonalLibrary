@@ -16,6 +16,30 @@ pipeline {
             }
         }
 
+        stage('SAST'){
+            steps {
+                withCredentials([string
+                (credentialsId: 'sast-token', 
+                variable: 'SAST_TOKEN')]) {
+                    dir('backend-api/jenkins/sast') {
+                        sh 'chmod +x sast.sh'
+                        sh './sast.sh'
+                    }
+
+                } 
+
+            }
+            post {
+                success {
+                    echo "SASY completed successfully for build ${BUILD_TAG}."
+                }
+                failure {
+                    echo "SAST analysis for build ${BUILD_TAG} failed."
+                }
+            }
+
+        }
+        
         stage('Build') {
             steps {
                 withCredentials([
