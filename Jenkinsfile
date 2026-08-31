@@ -19,7 +19,7 @@ pipeline {
         stage('SAST'){
             steps {
                 withCredentials([string
-                (credentialsId: 'sast-token', 
+                (credentialsId: 'sonarcloud-token', 
                 variable: 'SAST_TOKEN')]) {
                     dir('backend-api/jenkins/sast') {
                         sh 'chmod +x sast.sh'
@@ -39,7 +39,7 @@ pipeline {
             }
 
         }
-        
+
         stage('Build') {
             steps {
                 withCredentials([
