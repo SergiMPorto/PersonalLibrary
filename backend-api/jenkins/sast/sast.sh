@@ -3,10 +3,7 @@ set -e
 
 echo "******Running SAST with SonarCloud******"
 
-docker run --rm \
-  -e SONAR_TOKEN=$SONAR_TOKEN \
-  -v "$WORKSPACE:/usr/src" \
-  sonarsource/sonar-scanner-cli:latest \
+sonar-scanner \
   -Dsonar.projectKey=SergiMPorto_PersonalLibrary \
   -Dsonar.organization=sergimporto \
   -Dsonar.host.url=https://sonarcloud.io \
