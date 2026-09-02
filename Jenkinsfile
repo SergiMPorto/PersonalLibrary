@@ -14,30 +14,38 @@ pipeline {
                     sh './test.sh'
                 }
             }
-        }
 
-        stage('SAST'){
-            steps {
-                withCredentials([string
-                (credentialsId: 'sonarcloud-token', 
-                variable: 'SONAR_TOKEN')]) {
-                    dir('backend-api/jenkins/sast') {
-                        sh 'chmod +x sast.sh'
-                        sh './sast.sh'
-                    }
-
-                } 
-
-            }
             post {
                 success {
-                    echo "SASY completed successfully for build ${BUILD_TAG}."
+                    echo "Tests completed successfully for build ${BUILD_TAG}."
+                }
+                failure {
+                    echo "Tests failed for build ${BUILD_TAG}."
+                }
+            }
+        }
+
+        stage('SAST') {
+            steps {
+                withCredentials([
+                    string(
+                        credentialsId: 'sonarcloud-token',
+                        variable: 'SONAR_TOKEN'
+                    )
+                ]) {
+                    sh 'chmod +x backend-api/jenkins/sast/sast.sh'
+                    sh './backend-api/jenkins/sast/sast.sh'
+                }
+            }
+
+            post {
+                success {
+                    echo "SAST completed successfully for build ${BUILD_TAG}."
                 }
                 failure {
                     echo "SAST analysis for build ${BUILD_TAG} failed."
                 }
             }
-
         }
 
         stage('Build') {
@@ -73,6 +81,7 @@ pipeline {
                     sh './deploy.sh'
                 }
             }
+
             post {
                 success {
                     echo "Deployment of build ${BUILD_TAG} completed successfully."
