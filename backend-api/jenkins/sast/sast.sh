@@ -8,8 +8,8 @@ sonar-scanner \
   -Dsonar.organization=sergimporto \
   -Dsonar.host.url=https://sonarcloud.io \
   -Dsonar.token=$SONAR_TOKEN \
-  -Dsonar.sources=. \
+  -Dsonar.sources=$WORKSPACE \
   -Dsonar.inclusions=**/*.py,**/*.kt \
-  -Dsonar.exclusions=**/.venv/**,**/__pycache__/**,**/build/**,**/.gradle/**
+  -Dsonar.exclusions=**/.venv/**,**/__pycache__/**,**/tests/**,**/build/**,**/.gradle/**,**/node_modules/**
 
 echo "******SAST completed OK******"
