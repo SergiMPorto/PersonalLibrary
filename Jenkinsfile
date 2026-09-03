@@ -50,9 +50,9 @@ pipeline {
 
         stage('SCA') {
             steps {
-                dir('backend-api/jenkins/sca') {
-                    sh 'chmod +x sca.sh'
-                    sh './sca.sh'
+                sh 'chmod +x backend-api/jenkins/sca/sca.sh'
+                sh './backend-api/jenkins/sca/sca.sh'
+                    
                 }
             }
 
