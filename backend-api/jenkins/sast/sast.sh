@@ -9,7 +9,7 @@ sonar-scanner \
   -Dsonar.host.url=https://sonarcloud.io \
   -Dsonar.token=$SONAR_TOKEN \
   -Dsonar.sources=$WORKSPACE \
-  -Dsonar.inclusions=**/*.py,**/*.kt \
+  -Dsonar.inclusions=**/*.py \
   -Dsonar.exclusions=**/.venv/**,**/__pycache__/**,**/tests/**,**/build/**,**/.gradle/**,**/node_modules/**
 
 echo "******SAST completed OK******"
