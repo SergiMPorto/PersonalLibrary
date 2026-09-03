@@ -1,9 +1,12 @@
 #!/bin/bash
-
 set -e
 
-echo "Running SCA scan..."
+echo "******Running SCA with pip-audit******"
 
-docker run --rm -v "$WORKSPACE/backend-api:/app" -w /app python:3.11-slim bash -c "pip install pip-audit && pip-audit -r requirements.txt"
+docker run --rm \
+  -v "$WORKSPACE/backend-api/api:/app" \
+  -w /app \
+  python:3.11-slim \
+  bash -c "pip install -r requirements.txt --quiet && pip install pip-audit --quiet && pip-audit"
 
-echo "SCA scan completed."
+echo "******SCA completed OK******"
