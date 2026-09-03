@@ -52,8 +52,6 @@ pipeline {
             steps {
                 sh 'chmod +x backend-api/jenkins/sca/sca.sh'
                 sh './backend-api/jenkins/sca/sca.sh'
-                    
-                }
             }
 
             post {
@@ -110,3 +108,4 @@ pipeline {
             }
         }
     }
+}
