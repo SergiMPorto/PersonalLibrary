@@ -48,6 +48,24 @@ pipeline {
             }
         }
 
+        stage('SCA') {
+            steps {
+                dir('backend-api/jenkins/sca') {
+                    sh 'chmod +x sca.sh'
+                    sh './sca.sh'
+                }
+            }
+
+            post {
+                success {
+                    echo "SCA completed successfully for build ${BUILD_TAG}."
+                }
+                failure {
+                    echo "SCA analysis for build ${BUILD_TAG} failed."
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 withCredentials([
