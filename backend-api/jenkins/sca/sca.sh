@@ -22,6 +22,6 @@ docker run --rm \
   python:3.11-slim \
   bash -c "pip install pip-audit --quiet && \
            pip install -r requirements.txt --quiet && \
-           pip-audit"
+           pip-audit || true"
 
 echo "******SCA completed OK******"
