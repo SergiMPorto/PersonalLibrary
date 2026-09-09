@@ -18,7 +18,7 @@ db:
   host: "milibrary-postgres-postgres-service.pgtest.svc.cluster.local"
   port: "5432"
   name: "milibrary_db"
-  secretName: "milibrary-postgres-postgres-secret"
+  secretName: "postgres-secret"
   userKey: "username"
   passwordKey: "password"
 livenessProbe:
