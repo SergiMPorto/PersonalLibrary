@@ -8,7 +8,7 @@ image:
 service:
   type: NodePort
   port: 8000
-  targetPort: 80001
+  targetPort: 8000
   nodePort: 30080
   portName: metrics
 monitoring:
