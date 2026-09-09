@@ -12,7 +12,7 @@ service:
   nodePort: 30080
   portName: metrics
 monitoring:
-  enabled: true
+  enabled: false
   namespace: monitoring  
 db:
   host: "milibrary-postgres-postgres-service.pgtest.svc.cluster.local"
