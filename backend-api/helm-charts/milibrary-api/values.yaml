@@ -3,7 +3,7 @@ metadata:
 replicaCount: 1
 image:
   repository: sergimp/milibrary
-  tag: "v1.2.1"
+  tag: "v1.2.2"
   pullPolicy: IfNotPresent
 service:
   type: NodePort
@@ -15,7 +15,7 @@ monitoring:
   enabled: false
   namespace: monitoring  
 db:
-  host: "milibrary-postgres-postgres-service.pgtest.svc.cluster.local"
+  host: "postgres-service"
   port: "5432"
   name: "milibrary_db"
   secretName: "postgres-secret"
