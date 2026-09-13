@@ -1,10 +1,12 @@
 #!/bin/bash
 set -e
-echo "******Deploying to K3********"
 
-kubectl set image deployment/milibrary-api milibrary-api=sergimp/milibrary:${BUILD_TAG} -n milibrary
+echo "******Deploying to K3s with Helm******"
 
+helm upgrade milibrary-api \
+  $WORKSPACE/backend-api/helm-charts/milibrary-api \
+  --set image.tag=${BUILD_TAG} \
+  --namespace milibrary \
+  --wait
 
-kubectl rollout status deployment/milibrary-api -n milibrary
-
-echo "******Deployment completed********"
+echo "******Deploy completado OK******"
