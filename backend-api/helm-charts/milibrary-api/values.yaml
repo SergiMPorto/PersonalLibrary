@@ -42,9 +42,8 @@ resources:
     memory: "512Mi"
 ingress:
   enabled: true
-  className: nginx
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  className: traefik 
+  annotations: {}
   hosts:
     - host: api.milibrary.local
       paths:
