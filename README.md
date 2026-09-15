@@ -31,3 +31,5 @@ Escrito desde feature/avance-develop.
 Escrito desde feature/rebase-practica. 
 ## Sección A1
 Primera línea de la rama A.
+## Sección A2
+Segunda línea de la rama A.
