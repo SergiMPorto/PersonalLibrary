@@ -27,3 +27,5 @@
 
 ## Notas rama B
 Escrito desde feature/avance-develop.
+## Notas rama A
+Escrito desde feature/rebase-practica. 
