@@ -29,7 +29,6 @@
 Escrito desde feature/avance-develop.
 ## Notas rama A
 Escrito desde feature/rebase-practica. 
-## Sección A1
-Primera línea de la rama A.
-## Sección A2
-Segunda línea de la rama A.
+
+## Sección B
+Línea de la rama B.
