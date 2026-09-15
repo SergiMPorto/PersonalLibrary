@@ -24,3 +24,6 @@
 ## Structure
 - Helm
 - Docker
+
+## Notas rama B
+Escrito desde feature/avance-develop.
