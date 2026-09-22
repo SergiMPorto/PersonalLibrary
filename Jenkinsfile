@@ -64,6 +64,8 @@ pipeline {
             }
         }
 
+      
+
         stage('Build') {
             steps {
                 withCredentials([
@@ -88,6 +90,23 @@ pipeline {
                     echo "Build ${BUILD_TAG} failed."
                 }
             }
+        }
+
+
+          stage('Image Scan') {
+            steps {
+                sh 'chmod +x backend-api/jenkins/trivy/trivy.sh'
+                sh './backend-api/jenkins/trivy/trivy.sh'
+            }
+            post {
+                success {
+                    echo "Image scan completed successfully for build ${BUILD_TAG}."
+                }
+                failure {
+                    echo "Image scan for build ${BUILD_TAG} failed."
+                }
+            }
+
         }
 
         stage('Deploy') {
