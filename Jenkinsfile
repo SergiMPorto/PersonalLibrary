@@ -64,6 +64,22 @@ pipeline {
             }
         }
 
+        stage('Secrets Scan') {
+            steps {
+                sh 'chmod +x backend-api/jenkins/gitleaks/gitleaks'
+                sh './backend-api/jenkins/gitleaks/gitleaks.sh'
+            }
+
+            post {
+                success {
+                    echo "Secrets scan completed successfully for build ${BUILD_TAG}."
+                }
+                failure {
+                    echo "Secrets scan for build ${BUILD_TAG} failed."
+                }
+            }
+        }
+
       
 
         stage('Build') {
@@ -109,7 +125,14 @@ pipeline {
 
         }
 
-        stage('Deploy') {
+              stage('Deploy') {
+            when {
+                allOf {
+                    branch 'main'
+                    not { changeRequest() }
+                }
+            }
+
             steps {
                 dir('backend-api/jenkins/deploy') {
                     sh 'chmod +x deploy.sh'
