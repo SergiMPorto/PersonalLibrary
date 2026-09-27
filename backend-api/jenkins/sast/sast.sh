@@ -3,6 +3,10 @@ set -e
 
 echo "******Running SAST with SonarCloud******"
 
+#limit memor usage for sonar scanner
+export SONAR_SCANNER_OPTS="-Xmx512m"
+
+
 sonar-scanner \
   -Dsonar.projectKey=SergiMPorto_PersonalLibrary \
   -Dsonar.organization=sergimporto \
