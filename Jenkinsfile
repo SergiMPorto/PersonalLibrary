@@ -66,7 +66,7 @@ pipeline {
 
         stage('Secrets Scan') {
             steps {
-                sh 'chmod +x backend-api/jenkins/gitleaks/gitleaks'
+                sh 'chmod +x backend-api/jenkins/gitleaks/gitleaks.sh'
                 sh './backend-api/jenkins/gitleaks/gitleaks.sh'
             }
 

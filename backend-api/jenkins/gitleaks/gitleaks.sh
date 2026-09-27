@@ -8,5 +8,3 @@ docker run --rm \
   zricethezav/gitleaks:latest detect \
   --source /repo \
   --report-path /repo/gitleaks-report.json || true
-
-echo "******Secrets scan completed OK******"
