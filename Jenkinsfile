@@ -111,8 +111,7 @@ pipeline {
 
           stage('Image Scan') {
             steps {
-                sh 'chmod +x backend-api/jenkins/trivy/trivy.sh'
-                sh './backend-api/jenkins/trivy/trivy.sh'
+                sh 'bash /backend-api/jenkins/trivy/trivy.sh'
             }
             post {
                 success {
