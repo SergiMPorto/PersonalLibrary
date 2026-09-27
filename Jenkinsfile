@@ -47,8 +47,11 @@ pipeline {
 
         stage('Secrets Scan') {
             steps {
+
                 sh 'bash backend-api/jenkins/gitleaks/gitleaks.sh'
-            }
+
+            
+           }
             post {
                 success { echo "Secrets scan completed successfully for build ${BUILD_TAG}." }
                 failure { echo "Secrets scan for build ${BUILD_TAG} failed." }
@@ -78,6 +81,9 @@ pipeline {
             steps {
                 sh 'bash backend-api/jenkins/trivy/trivy.sh'
             }
+               
+                           
+                       
             post {
                 success { echo "Image scan completed successfully for build ${BUILD_TAG}." }
                 failure { echo "Image scan for build ${BUILD_TAG} failed." }
