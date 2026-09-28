@@ -9,6 +9,7 @@ docker compose -f docker-compose.yaml build --no-cache
 echo "Usuario: $DOCKER_USERNAME"
 echo "Token longitud: ${#DOCKER_TOKEN}"
 
+docker rmi "sergimp/milibrary:latest" 2>/dev/null || true
 docker tag "sergimp/milibrary:${BUILD_TAG}" "sergimp/milibrary:latest"
 
 echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin

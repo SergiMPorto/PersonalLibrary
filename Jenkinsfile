@@ -14,140 +14,95 @@ pipeline {
                     sh './test.sh'
                 }
             }
-
             post {
-                success {
-                    echo "Tests completed successfully for build ${BUILD_TAG}."
-                }
-                failure {
-                    echo "Tests failed for build ${BUILD_TAG}."
-                }
+                success { echo "Tests completed successfully for build ${BUILD_TAG}." }
+                failure { echo "Tests failed for build ${BUILD_TAG}." }
             }
         }
 
         stage('SAST') {
             steps {
-                withCredentials([
-                    string(
-                        credentialsId: 'sonarcloud-token',
-                        variable: 'SONAR_TOKEN'
-                    )
-                ]) {
-                    sh 'chmod +x backend-api/jenkins/sast/sast.sh'
-                    sh './backend-api/jenkins/sast/sast.sh'
+                withCredentials([string(
+                    credentialsId: 'sonarcloud-token',
+                    variable: 'SONAR_TOKEN'
+                )]) {
+                    sh 'bash backend-api/jenkins/sast/sast.sh'
                 }
             }
-
             post {
-                success {
-                    echo "SAST completed successfully for build ${BUILD_TAG}."
-                }
-                failure {
-                    echo "SAST analysis for build ${BUILD_TAG} failed."
-                }
+                success { echo "SAST completed successfully for build ${BUILD_TAG}." }
+                failure { echo "SAST analysis for build ${BUILD_TAG} failed." }
             }
         }
 
         stage('SCA') {
             steps {
-                sh 'chmod +x backend-api/jenkins/sca/sca.sh'
-                sh './backend-api/jenkins/sca/sca.sh'
+                sh 'bash backend-api/jenkins/sca/sca.sh'
             }
-
             post {
-                success {
-                    echo "SCA completed successfully for build ${BUILD_TAG}."
-                }
-                failure {
-                    echo "SCA analysis for build ${BUILD_TAG} failed."
-                }
+                success { echo "SCA completed successfully for build ${BUILD_TAG}." }
+                failure { echo "SCA analysis for build ${BUILD_TAG} failed." }
             }
         }
 
         stage('Secrets Scan') {
             steps {
-                sh 'chmod +x backend-api/jenkins/gitleaks/gitleaks.sh'
-                sh './backend-api/jenkins/gitleaks/gitleaks.sh'
-            }
 
+                sh 'bash backend-api/jenkins/gitleaks/gitleaks.sh'
+
+            
+           }
             post {
-                success {
-                    echo "Secrets scan completed successfully for build ${BUILD_TAG}."
-                }
-                failure {
-                    echo "Secrets scan for build ${BUILD_TAG} failed."
-                }
+                success { echo "Secrets scan completed successfully for build ${BUILD_TAG}." }
+                failure { echo "Secrets scan for build ${BUILD_TAG} failed." }
             }
         }
 
-      
-
         stage('Build') {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-credentials',
-                        usernameVariable: 'DOCKER_USERNAME',
-                        passwordVariable: 'DOCKER_TOKEN'
-                    )
-                ]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_TOKEN'
+                )]) {
                     dir('backend-api/jenkins/build') {
                         sh 'chmod +x build.sh'
                         sh './build.sh'
                     }
                 }
             }
-
             post {
-                success {
-                    echo "Build ${BUILD_TAG} completed successfully."
-                }
-                failure {
-                    echo "Build ${BUILD_TAG} failed."
-                }
+                success { echo "Build ${BUILD_TAG} completed successfully." }
+                failure { echo "Build ${BUILD_TAG} failed." }
             }
         }
 
-
-          stage('Image Scan') {
+        stage('Image Scan') {
             steps {
                 sh 'bash backend-api/jenkins/trivy/trivy.sh'
+            }
                
                            
-                           }
+                       
             post {
-                success {
-                    echo "Image scan completed successfully for build ${BUILD_TAG}."
-                }
-                failure {
-                    echo "Image scan for build ${BUILD_TAG} failed."
-                }
+                success { echo "Image scan completed successfully for build ${BUILD_TAG}." }
+                failure { echo "Image scan for build ${BUILD_TAG} failed." }
             }
-
         }
 
-              stage('Deploy') {
+        stage('Deploy') {
             when {
-                allOf {
-                    branch 'main'
-                    not { changeRequest() }
-                }
+                branch 'main'
             }
-
             steps {
                 dir('backend-api/jenkins/deploy') {
                     sh 'chmod +x deploy.sh'
                     sh './deploy.sh'
                 }
             }
-
             post {
-                success {
-                    echo "Deployment of build ${BUILD_TAG} completed successfully."
-                }
-                failure {
-                    echo "Deployment of build ${BUILD_TAG} failed."
-                }
+                success { echo "Deployment of build ${BUILD_TAG} completed successfully." }
+                failure { echo "Deployment of build ${BUILD_TAG} failed." }
             }
         }
     }
