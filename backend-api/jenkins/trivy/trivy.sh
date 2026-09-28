@@ -9,7 +9,7 @@ docker run --rm \
   aquasec/trivy image \
   --exit-code 0 \
   --no-progress \
-  --time 15m \
+  --timeout 15m \
   sergimp/milibrary:${BUILD_TAG}
 
 echo "******Trivy scan completed OK******"
