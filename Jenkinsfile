@@ -110,8 +110,11 @@ pipeline {
                 sh 'bash backend-api/jenkins/dast/dast.sh'
             }
             post {
-                success { echo "DAST scan completed successfully for build ${BUILD_TAG}." }
-                failure { echo "DAST scan for build ${BUILD_TAG} failed." }
+                always {
+                     archiveArtifacts artifacts: 'zap-reports/*.html', allowEmptyArchive: true
+                }
+                success { echo "DAST completed successfully for build ${BUILD_TAG}." }
+                failure { echo "DAST analysis for build ${BUILD_TAG} failed." }
             }
         }
     }
