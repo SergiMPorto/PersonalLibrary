@@ -3,13 +3,16 @@ set -e
 
 echo "******Running DAST Scan******"
 
-mkdir -p /opt/jenkins_home/workspace/PersonalLibrary-Multibranch_main/zap-reports
-chmod 777 /opt/jenkins_home/workspace/PersonalLibrary-Multibranch_main/zap-reports
+# Convert the container path to the host path
+HOST_WORKSPACE=$(echo $WORKSPACE | sed 's|/var/jenkins_home|/opt/jenkins_home|g')
 
+mkdir -p $HOST_WORKSPACE/zap-reports
+chmod 777 $HOST_WORKSPACE/zap-reports
+
+# add DNS ins container to resolve the API hostname
 docker run --rm \
-  # add DNS enter container to resolve the API hostname to the correct IP address
   --add-host="api.milibrary.home.arpa:192.168.1.200" \
-  -v "/opt/jenkins_home/workspace/PersonalLibrary-Multibranch_main/zap-reports:/zap/wrk/:rw" \
+  -v "$HOST_WORKSPACE/zap-reports:/zap/wrk/:rw" \
   ghcr.io/zaproxy/zaproxy:stable \
   zap-api-scan.py \
   -t http://api.milibrary.home.arpa/openapi.json \
