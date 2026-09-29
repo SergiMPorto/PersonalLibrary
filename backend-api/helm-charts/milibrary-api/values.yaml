@@ -45,7 +45,7 @@ ingress:
   className: traefik 
   annotations: {}
   hosts:
-    - host: api.milibrary.local
+    - host: api.milibrary.home.arpa
       paths:
         - path: /
           pathType: Prefix
