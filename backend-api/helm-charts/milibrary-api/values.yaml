@@ -6,10 +6,9 @@ image:
   tag: "v1.2.2"
   pullPolicy: IfNotPresent
 service:
-  type: NodePort
+  type: ClusterIP
   port: 8000
   targetPort: 8000
-  nodePort: 30080
   portName: metrics
 monitoring:
   enabled: false
