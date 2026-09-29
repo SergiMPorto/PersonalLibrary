@@ -105,5 +105,14 @@ pipeline {
                 failure { echo "Deployment of build ${BUILD_TAG} failed." }
             }
         }
+    }   stage('DAST') {
+            steps {
+                sh 'bash backend-api/jenkins/dast/dast.sh'
+            }
+            post {
+                success { echo "DAST scan completed successfully for build ${BUILD_TAG}." }
+                failure { echo "DAST scan for build ${BUILD_TAG} failed." }
+            }
+        }
     }
 }
