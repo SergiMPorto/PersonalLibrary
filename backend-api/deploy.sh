@@ -1,12 +1,11 @@
 #!/bin/bash
 set -e
 
-echo "Desplegando PersonalLibrary en K3..."
+# Despliega la infraestructura base de PersonalLibrary en K3s:
+# namespace, PostgreSQL e inicialización de la base de datos.
+# La API se despliega con Helm: helm-charts/milibrary-api
 
-#!/bin/bash
-set -e
-
-echo "Desplegando PersonalLibrary en K3s..."
+echo "Desplegando infraestructura base de PersonalLibrary en K3s..."
 
 kubectl apply -f kubernetes/namespace.yaml
 kubectl apply -f kubernetes/postgres-configmap.yaml
@@ -25,15 +24,7 @@ kubectl apply -f kubernetes/db-init-job.yaml
 kubectl wait --for=condition=complete job/db-init \
   -n milibrary --timeout=60s
 
-echo "Desplegando API..."
-kubectl apply -f kubernetes/api-deployment.yaml
-kubectl apply -f kubernetes/api-service.yaml
-
-kubectl wait --for=condition=ready pod \
-  -l app=milibrary-api -n milibrary --timeout=180s
-
 echo ""
-echo "Despliegue completado!"
-echo ""
-echo "URL de la API:"
-kubectl get svc milibrary-api-service -n milibrary
+echo "Infraestructura base desplegada."
+echo "Para desplegar la API:"
+echo "  helm upgrade --install milibrary-api helm-charts/milibrary-api -n milibrary --set-string image.tag=<TAG>"
