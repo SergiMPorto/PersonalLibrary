@@ -1,12 +1,16 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 echo "******Deploying to K3s with Helm******"
 
-helm upgrade milibrary-api \
-  $WORKSPACE/backend-api/helm-charts/milibrary-api \
-  --set image.tag=${BUILD_TAG} \
+helm upgrade --install milibrary-api "${WORKSPACE}/backend-api/helm-charts/milibrary-api" \
   --namespace milibrary \
-  --wait
+  --set-string image.tag="${BUILD_TAG}" \
+  --wait \
+  --timeout 10m
+
+echo "******Smoke test******"
+sleep 15
+curl -f -H "Host: api.milibrary.home.arpa" http://192.168.1.200/health
 
 echo "******Deploy completado OK******"
