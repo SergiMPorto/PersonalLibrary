@@ -9,9 +9,9 @@ spec:
   selector:
     app: {{ .Values.metadata.app }}
   ports:
-    - name: {{ .Values.service.portName | default "http"  }}
+    - name: {{ .Values.service.portName | default "http" }}
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
-      {{- if eq .Values.service.type "NodePort" }}
+      {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
