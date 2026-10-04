@@ -5,8 +5,10 @@ kube-prometheus-stack:
     create: false
 
   grafana:
-    adminUser: admin
-    adminPassword: admin1234
+    admin:
+      existingSecret: grafana-admin
+      userKey: admin-user
+      passwordKey: admin-password
     defaultDashboardsTimezone: browser
     service:
       type: LoadBalancer
@@ -14,8 +16,8 @@ kube-prometheus-stack:
       enabled: true
       size: 5Gi
     resources:
-      requests: { cpu: 50m, memory: 100Mi }
-      limits: { memory: 200Mi }
+      requests: { cpu: 50m, memory: 200Mi }
+      limits: { memory: 400Mi }
 
   prometheus:
     prometheusSpec:
@@ -38,6 +40,8 @@ kube-prometheus-stack:
   alertmanager:
     enabled: false
 
+  kubeApiServer:
+    enabled: false
   kubeEtcd:
     enabled: false
   kubeControllerManager:
