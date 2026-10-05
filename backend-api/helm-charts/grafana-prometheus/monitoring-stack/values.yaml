@@ -16,8 +16,8 @@ kube-prometheus-stack:
       enabled: true
       size: 5Gi
     resources:
-      requests: { cpu: 50m, memory: 200Mi }
-      limits: { memory: 400Mi }
+      requests: { cpu: 50m, memory: 100Mi }
+      limits: { memory: 200Mi }
 
   prometheus:
     prometheusSpec:
@@ -40,8 +40,6 @@ kube-prometheus-stack:
   alertmanager:
     enabled: false
 
-  kubeApiServer:
-    enabled: false
   kubeEtcd:
     enabled: false
   kubeControllerManager:
