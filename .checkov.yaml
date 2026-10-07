@@ -1,0 +1,22 @@
+# 
+
+framework:
+  - dockerfile
+  - kubernetes
+  - helm
+
+
+soft-fail-on:
+  - LOW
+  - MEDIUM
+
+skip-check:
+  
+  - CKV_DOCKER_2   # HEALTHCHECK 
+  - CKV_K8S_30     # runAsNonRoot
+  - CKV2_K8S_6     # PodDisruptionBudget 
+
+skip-path:
+  - backend-api/helm-charts/grafana-prometheus/monitoring-stack/charts  
+  - backend-api/api/Dockerfile.test                                     
+  - .circleci                                                           
