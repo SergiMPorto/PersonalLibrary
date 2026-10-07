@@ -84,6 +84,28 @@ pipeline {
             }
         }
 
+        stage('IaC Scan'){
+             steps {
+        sh 'bash backend-api/jenkins/checkov/checkov.sh'
+    }
+    post {
+        always {
+            junit(
+                testResults: 'checkov-reports/checkov-report-*.xml',
+                allowEmptyResults: true
+            )
+            archiveArtifacts artifacts: 'checkov-reports/*.xml',
+                             allowEmptyArchive: true
+        }
+        success {
+            echo "IaC scan completed successfully for build ${BUILD_TAG}."
+        }
+        failure {
+            echo "IaC scan for build ${BUILD_TAG} failed."
+        }
+    }
+
+        }
         stage('Deploy') {
             when {
                 branch 'main'
