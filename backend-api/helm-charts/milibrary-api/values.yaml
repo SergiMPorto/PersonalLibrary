@@ -12,7 +12,7 @@ service:
   portName: metrics
 monitoring:
   enabled: false
-  namespace: monitoring  
+  namespace: monitoring
 db:
   host: "postgres-service"
   port: "5432"
@@ -32,6 +32,24 @@ readinessProbe:
     port: 8000
   initialDelaySeconds: 5
   periodSeconds: 10
+
+# Securited a pod
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001        
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault  
+
+# Securited Container
+securityContext:
+  allowPrivilegeEscalation: false   
+  readOnlyRootFilesystem: true      
+  capabilities:
+    drop:
+      - ALL                         
+
 resources:
   requests:
     cpu: "100m"
@@ -41,7 +59,7 @@ resources:
     memory: "512Mi"
 ingress:
   enabled: true
-  className: traefik 
+  className: traefik
   annotations: {}
   hosts:
     - host: api.milibrary.home.arpa
