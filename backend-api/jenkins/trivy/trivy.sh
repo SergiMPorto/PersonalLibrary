@@ -1,12 +1,13 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-echo "******Running Image Scan with Trivy******"
+echo "******Running Image Scan with Trivy (linux/arm64)******"
 
 docker run --rm \
-  -v /var/run/docker.sock:/var/run/docker.sock \
   -v /tmp/trivy-cache:/root/.cache/trivy \
   aquasec/trivy image \
+  --image-src remote \
+  --platform linux/arm64 \
   --exit-code 0 \
   --no-progress \
   --timeout 15m \

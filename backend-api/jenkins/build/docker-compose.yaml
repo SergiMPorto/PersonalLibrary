@@ -1,5 +1,0 @@
-services:
-  personal-library-api:
-    build:
-      context: ../../api
-    image:  "sergimp/milibrary:${BUILD_TAG:-latest}"
