@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        BUILD_TAG = "${env.BUILD_NUMBER}"
+            BUILD_TAG = "${env.BRANCH_NAME.replaceAll('/', '-')}-${env.BUILD_NUMBER}"
+
     }
 
     stages {
