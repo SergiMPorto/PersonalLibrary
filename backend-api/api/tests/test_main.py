@@ -1,7 +1,5 @@
 """Tests de la API con PostgreSQL mockeada.
 
-No requieren base de datos: se ejecutan en cualquier entorno, incluido
-el agente de Jenkins, que no tiene acceso a la PostgreSQL del cluster.
 """
 import pytest
 
@@ -62,3 +60,20 @@ async def test_get_stats_returns_totals_and_recent(client, mock_conn):
     assert response.status_code == 200
     assert response.json()["total_books"] == 5
     assert response.json()["recent_books"] == ["Dune", "Neuromante"]
+
+
+async def test_get_book_out_of_range_id_returns_422(client, mock_conn):
+    # Misma URL que encontró ZAP: el id no cabe en un INTEGER de PostgreSQL
+    response = await client.get("/api/books/5734095095508324799")
+
+    assert response.status_code == 422
+    mock_conn.fetchrow.assert_not_called()
+
+
+async def test_search_with_null_byte_is_sanitized(client, mock_conn):
+    mock_conn.fetch.return_value = []
+
+    response = await client.get("/api/books", params={"search": "Du\x00ne"})
+
+    assert response.status_code == 200
+    assert mock_conn.fetch.call_args.args[1] == "Dune"
