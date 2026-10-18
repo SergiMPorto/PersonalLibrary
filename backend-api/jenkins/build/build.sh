@@ -1,24 +1,32 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-echo "*******Building Backend FastAPI Image*******"
+echo "*******Building Backend FastAPI Image (linux/arm64)*******"
 
-cd "$WORKSPACE/backend-api/jenkins/build"
+IMAGE="sergimp/milibrary"
+PLATFORM="linux/arm64"
+BUILDER="jenkins-builder"
 
-docker compose -f docker-compose.yaml build --no-cache
-echo "Usuario: $DOCKER_USERNAME"
-echo "Token longitud: ${#DOCKER_TOKEN}"
+# 1. Builder multi-arquitectura propio de Jenkins (se crea solo la primera vez)
+if ! docker buildx inspect "$BUILDER" > /dev/null 2>&1; then
+  docker buildx create --name "$BUILDER" --driver docker-container
+fi
 
-docker rmi "sergimp/milibrary:latest" 2>/dev/null || true
-docker tag "sergimp/milibrary:${BUILD_TAG}" "sergimp/milibrary:latest"
-
+# 2. Login antes del build: buildx sube la imagen directamente al registro
 echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
-docker push "sergimp/milibrary:${BUILD_TAG}"
-docker push "sergimp/milibrary:latest"
 
+# 3. Build para arm64 y push en un solo paso
+docker buildx build \
+  --builder "$BUILDER" \
+  --platform "$PLATFORM" \
+  --no-cache \
+  -t "${IMAGE}:${BUILD_TAG}" \
+  -t "${IMAGE}:latest" \
+  --push \
+  "$WORKSPACE/backend-api/api"
 
 docker logout
 
 echo "************************"
-echo "******* Build y push OK *******"
+echo "******* Build y push OK (${PLATFORM}) *******"
 echo "************************"

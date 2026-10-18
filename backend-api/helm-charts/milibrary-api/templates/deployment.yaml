@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ .Values.metadata.app }}
 spec:
@@ -14,10 +15,15 @@ spec:
       labels:
         app: {{ .Values.metadata.app }}
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: api
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
             - containerPort: 8000
           env:
@@ -26,11 +32,11 @@ spec:
             - name: DB_PORT
               value: {{ .Values.db.port | quote }}
             - name: DB_NAME
-              value: {{ .Values.db.name | quote  }}
+              value: {{ .Values.db.name | quote }}
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.db.secretName | quote}}
+                  name: {{ .Values.db.secretName | quote }}
                   key: {{ .Values.db.userKey | quote }}
             - name: DB_PASSWORD
               valueFrom:
@@ -38,17 +44,8 @@ spec:
                   name: {{ .Values.db.secretName }}
                   key: {{ .Values.db.passwordKey }}
           livenessProbe:
-            httpGet:
-              path: {{ .Values.livenessProbe.httpGet.path }}
-              port: {{ .Values.livenessProbe.httpGet.port }}
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
-            httpGet:
-              path: {{ .Values.readinessProbe.httpGet.path }}
-              port: {{ .Values.readinessProbe.httpGet.port }}
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-
