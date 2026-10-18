@@ -27,7 +27,7 @@ COPY . .
 # Crear usuario no-root (SIMPLIFICADO pero igual de seguro)
 RUN useradd --create-home --shell /bin/bash appuser && \
     chown -R appuser:appuser /app
-USER appuser
+USER 10001:10001
 
 # Exponer puerto
 EXPOSE 8000
