@@ -17,6 +17,5 @@ skip-check:
   - CKV_K8S_43
 
 skip-path:
-  - backend-api/helm-charts/grafana-prometheus
   - backend-api/api/Dockerfile.test                                     
   - .circleci                                                           
