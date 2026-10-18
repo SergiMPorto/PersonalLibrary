@@ -1,5 +1,7 @@
 """Tests de la API con PostgreSQL mockeada.
 
+No requieren base de datos: se ejecutan en cualquier entorno, incluido
+el agente de Jenkins, que no tiene acceso a la PostgreSQL del cluster.
 """
 import pytest
 
@@ -77,3 +79,11 @@ async def test_search_with_null_byte_is_sanitized(client, mock_conn):
 
     assert response.status_code == 200
     assert mock_conn.fetch.call_args.args[1] == "Dune"
+
+
+async def test_create_book_title_too_long_returns_422(client, mock_conn):
+    # La columna title es VARCHAR(500): un título más largo no debe llegar a la BD
+    response = await client.post("/api/books", json={"title": "x" * 501})
+
+    assert response.status_code == 422
+    mock_conn.fetchrow.assert_not_called()

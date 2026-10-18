@@ -44,8 +44,10 @@ api_info.labels(version="1.0.0").set(1)
 
 # Modelos Pydantic
 class BookBase(BaseModel):
-    google_books_id: Optional[str] = Field(None, alias="googleBooksId")
-    title: str
+    # Los límites coinciden con las columnas de la tabla books:
+    # google_books_id VARCHAR(50) y title VARCHAR(500)
+    google_books_id: Optional[str] = Field(None, alias="googleBooksId", max_length=50)
+    title: str = Field(..., min_length=1, max_length=500)
     authors: Optional[str] = None
     description: Optional[str] = None
     thumbnail_url: Optional[str] = Field(None, alias="thumbnailUrl")
