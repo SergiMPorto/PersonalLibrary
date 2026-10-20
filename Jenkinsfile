@@ -93,6 +93,7 @@ pipeline {
             junit(
                 testResults: 'checkov-reports/checkov-report-*.xml',
                 allowEmptyResults: true
+                skipPublishingChecks: true
             )
             archiveArtifacts artifacts: 'checkov-reports/*.xml',
                              allowEmptyArchive: true
