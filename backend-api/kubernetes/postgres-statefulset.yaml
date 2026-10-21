@@ -13,10 +13,18 @@ spec:
     metadata:
       labels:
         app: postgres
+      annotations:
+        seccomp.security.alpha.kubernetes.io/pod: runtime/default
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: postgres
         image: postgres:15
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
         ports:
         - containerPort: 5432
         env:
@@ -40,6 +48,28 @@ spec:
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
+
+
+        livenessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - library_user
+              - -d
+              - milibrary_db
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - library_user
+              - -d
+              - milibrary_db
+          initialDelaySeconds: 10
+          periodSeconds: 5
         resources:
           requests:
             memory: "128Mi"

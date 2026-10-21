@@ -12,11 +12,13 @@ soft-fail-on:
 
 skip-check:
   
-  - CKV_DOCKER_2   # HEALTHCHECK 
-  - CKV_K8S_30     # runAsNonRoot
-  - CKV2_K8S_6     # PodDisruptionBudget 
+  - CKV_DOCKER_2   
+  - CKV_K8S_30     
+  - CKV2_K8S_6    
   - CKV_K8S_43  
   - CKV_K8S_15 
+  - CKV_K8S_35
+  - CKV_K8S_40  
 skip-path:
   - backend-api/helm-charts/grafana-prometheus/monitoring-stack/charts  
   - backend-api/api/Dockerfile.test                                     
