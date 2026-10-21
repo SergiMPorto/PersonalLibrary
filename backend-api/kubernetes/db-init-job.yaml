@@ -5,11 +5,20 @@ metadata:
   namespace: milibrary
 spec:
   template:
+    metadata:
+      annotations:
+        seccomp.security.alpha.kubernetes.io/pod: 'runtime/default'
     spec:
       restartPolicy: OnFailure
+      automountServiceAccountToken: false
       containers:
       - name: db-init
         image: postgres:15
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
         env:
         - name: PGPASSWORD
           valueFrom:
