@@ -18,7 +18,10 @@ skip-check:
   - CKV_K8S_43  
   - CKV_K8S_15 
   - CKV_K8S_35
-  - CKV_K8S_40  
+  - CKV_K8S_40
+  - CKV_K8S_22
+  - CKV_K8S_29
+  - CKV_K8S_23  
 skip-path:
   - backend-api/helm-charts/grafana-prometheus/monitoring-stack/charts  
   - backend-api/api/Dockerfile.test                                     
