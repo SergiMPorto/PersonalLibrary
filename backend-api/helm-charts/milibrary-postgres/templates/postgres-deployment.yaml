@@ -14,10 +14,17 @@ spec:
     metadata:
       labels:
         app: postgres
+      annotations:
+        seccomp.security.alpha.kubernetes.io/pod: 'runtime/default'  
     spec:
       containers:
       - name: postgres
         image: postgres:15
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
         ports:
         - containerPort: 5432
         env:

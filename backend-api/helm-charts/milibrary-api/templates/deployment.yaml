@@ -14,17 +14,17 @@ spec:
       labels:
         app: {{ .Values.metadata.app }}
       annotations:
-        seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'runtime/default'  
+        seccomp.security.alpha.kubernetes.io/pod: runtime/default
     spec:
       automountServiceAccountToken: false
       securityContext:
-        runAsUser: 1001
         runAsNonRoot: true
+        runAsUser: 1001
       containers:
         - name: api
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          seecurityContext:
+          securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities:
@@ -63,4 +63,3 @@ spec:
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-
