@@ -48,6 +48,28 @@ spec:
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - library_user
+              - -d
+              - milibrary_db
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - library_user
+              - -d
+              - milibrary_db
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        
+         
         resources:
           requests:
             memory: "256Mi"
