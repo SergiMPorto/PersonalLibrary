@@ -1,10 +1,8 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-postgres-deployment
   namespace: {{ .Values.global.namespace }}
-
 spec:
   replicas: 1
   selector:
@@ -15,8 +13,9 @@ spec:
       labels:
         app: postgres
       annotations:
-        seccomp.security.alpha.kubernetes.io/pod: 'runtime/default'  
+        seccomp.security.alpha.kubernetes.io/pod: runtime/default
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: postgres
         image: postgres:15
@@ -48,6 +47,26 @@ spec:
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - library_user
+              - -d
+              - milibrary_db
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - library_user
+              - -d
+              - milibrary_db
+          initialDelaySeconds: 10
+          periodSeconds: 5
         resources:
           requests:
             memory: "256Mi"

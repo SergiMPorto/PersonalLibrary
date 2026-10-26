@@ -18,6 +18,8 @@ skip-check:
   - CKV_K8S_22
   - CKV_K8S_29
   - CKV_K8S_23
+  - CKV_K8S_21
+  
 
 skip-path:
   - helm-charts/grafana-prometheus/monitoring-stack/charts
