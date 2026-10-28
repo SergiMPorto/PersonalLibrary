@@ -6,6 +6,9 @@ echo "  Running IaC Scan — Checkov"
 echo "  Build: ${BUILD_TAG:-local}"
 echo "=============================="
 
+rm -rf checkov-reports/
+mkdir -p checkov-reports/
+
 REPO_ROOT="${WORKSPACE}"
 REPORT_DIR="${WORKSPACE}/checkov-reports"
 
