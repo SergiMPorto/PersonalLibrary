@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Query
+from fastapi import FastAPI, HTTPException, Depends, Query, Path
 import asyncpg
 import os
 import time
@@ -8,6 +8,10 @@ from datetime import datetime
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 from starlette.responses import PlainTextResponse
 from pydantic import BaseModel, Field
+
+# Máximo de una columna INTEGER/SERIAL en PostgreSQL.
+# Un id mayor hace fallar a asyncpg antes de llegar a la consulta.
+PG_INT_MAX = 2_147_483_647
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -40,8 +44,10 @@ api_info.labels(version="1.0.0").set(1)
 
 # Modelos Pydantic
 class BookBase(BaseModel):
-    google_books_id: Optional[str] = Field(None, alias="googleBooksId")
-    title: str
+    # Los límites coinciden con las columnas de la tabla books:
+    # google_books_id VARCHAR(50) y title VARCHAR(500)
+    google_books_id: Optional[str] = Field(None, alias="googleBooksId", max_length=50)
+    title: str = Field(..., min_length=1, max_length=500)
     authors: Optional[str] = None
     description: Optional[str] = None
     thumbnail_url: Optional[str] = Field(None, alias="thumbnailUrl")
@@ -135,12 +141,17 @@ async def health_check(db: asyncpg.Connection = Depends(get_db)):
 
 @app.get("/api/books", response_model=List[Book])
 async def get_books(
-    search: Optional[str] = Query(None, description="Buscar libros"),
+    search: Optional[str] = Query(None, max_length=200, description="Buscar libros"),
     limit: int = Query(20, ge=1, le=100, description="Límite de resultados"),
     offset: int = Query(0, ge=0, description="Offset para paginación"),
     db: asyncpg.Connection = Depends(get_db)
 ):
     """Obtener libros - optimizado para app móvil"""
+    # PostgreSQL no admite el carácter nulo (\x00) en un texto: se elimina
+    # antes de la consulta. Una búsqueda solo con espacios cuenta como vacía.
+    if search:
+        search = search.replace("\x00", "").strip()
+
     try:
         if search:
             query = """
@@ -201,7 +212,10 @@ async def create_book(book: BookBase, db: asyncpg.Connection = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Error al crear libro")
 
 @app.get("/api/books/{book_id}", response_model=Book)
-async def get_book(book_id: int, db: asyncpg.Connection = Depends(get_db)):
+async def get_book(
+    book_id: int = Path(..., ge=1, le=PG_INT_MAX, description="ID del libro"),
+    db: asyncpg.Connection = Depends(get_db)
+):
     """Obtener libro específico"""
     try:
         row = await db.fetchrow("SELECT * FROM books WHERE id = $1", book_id)
@@ -217,7 +231,10 @@ async def get_book(book_id: int, db: asyncpg.Connection = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Error al obtener libro")
 
 @app.delete("/api/books/{book_id}")
-async def delete_book(book_id: int, db: asyncpg.Connection = Depends(get_db)):
+async def delete_book(
+    book_id: int = Path(..., ge=1, le=PG_INT_MAX, description="ID del libro"),
+    db: asyncpg.Connection = Depends(get_db)
+):
     """Eliminar libro"""
     try:
         row = await db.fetchrow(

@@ -6,9 +6,6 @@ echo "  Running IaC Scan — Checkov"
 echo "  Build: ${BUILD_TAG:-local}"
 echo "=============================="
 
-rm -rf checkov-reports/
-mkdir -p checkov-reports/
-
 REPO_ROOT="${WORKSPACE}"
 REPORT_DIR="${WORKSPACE}/checkov-reports"
 
@@ -19,7 +16,6 @@ HOST_REPORT_DIR=$(echo "$REPORT_DIR" | sed "s|^/var/jenkins_home|${JENKINS_HOME_
 mkdir -p "$REPORT_DIR"
 chmod 777 "$REPORT_DIR"
 
-set +e
 docker run --rm \
   -v "${HOST_REPO_ROOT}:/repo:ro" \
   -v "${HOST_REPORT_DIR}:/reports:rw" \
@@ -29,10 +25,11 @@ docker run --rm \
     --output cli \
     --output junitxml \
     --output-file-path /reports
-set -e
 
-mv "${REPORT_DIR}/results_junitxml.xml" \
-   "${REPORT_DIR}/checkov-report-${BUILD_TAG:-local}.xml" 2>/dev/null || true
+if [ -f "${REPORT_DIR}/results_junitxml.xml" ]; then
+  mv "${REPORT_DIR}/results_junitxml.xml" \
+     "${REPORT_DIR}/checkov-report-${BUILD_TAG:-local}.xml"
+fi
 
 echo "=============================="
 echo "  Checkov scan completed OK"

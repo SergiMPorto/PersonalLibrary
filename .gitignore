@@ -31,4 +31,3 @@ secrets/
 local.properties
 
 # dir
-backend-api/helm-charts/grafana-prometheus/grafana-admin-secret.yaml
